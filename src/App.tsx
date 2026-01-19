@@ -1,14 +1,16 @@
-import {Image} from "primereact/image";
+import {Image} from 'primereact/image';
 import {Card} from 'primereact/card';
 import {Dropdown} from 'primereact/dropdown';
 import {Button} from 'primereact/button';
 import {Rating} from 'primereact/rating';
 import {FloatLabel} from 'primereact/floatlabel';
-import "primereact/resources/themes/bootstrap4-dark-purple/theme.css";
+import 'primereact/resources/themes/bootstrap4-dark-purple/theme.css';
 import 'primeicons/primeicons.css';
 
+import * as React from 'react';
 import {useEffect, useState} from 'react';
-import type {Photo} from "./models/Photo.ts";
+import type {Photo} from './models/Photo.ts';
+import {useGlobalKeydown} from "./KeyBoardEvents.tsx";
 
 interface YearPickerProps {
     years: number[];
@@ -193,6 +195,18 @@ function PhotoView({photoIds}: PhotoViewProps) {
 
     }
 
+    function onKeyDown(e: React.KeyboardEvent) {
+        if (e.key === 'ArrowLeft') {
+            previousPhoto();
+        } else if (e.key === 'ArrowRight') {
+            nextPhoto();
+        }
+    }
+
+    useGlobalKeydown((e: React.KeyboardEvent) => {
+        onKeyDown(e);
+    })
+
     return (
         <div id="image-container">
             <Card title={cardTitle}>
@@ -219,4 +233,3 @@ function PhotoView({photoIds}: PhotoViewProps) {
 }
 
 export default App
-
