@@ -55,6 +55,8 @@ export function PhotoView({photoIds}: PhotoViewProps) {
                 <>
                     <div className="photo">
                         <Image src={"http://localhost:8080/api/photo/" + photoIds[currentPhoto]}
+                               preview
+                               indicatorIcon="pi pi-search"
                                height="100%"/>
                     </div>
                     <div id="photo-nav-container">
