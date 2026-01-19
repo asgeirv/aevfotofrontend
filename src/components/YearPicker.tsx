@@ -16,6 +16,7 @@ export function YearPicker({years, selectedYear, setYear}: YearPickerProps) {
         <div className="datepicker-container">
             <FloatLabel>
                 <Dropdown inputId="year-picker"
+                          variant="filled"
                           value={selectedYear}
                           onChange={e => setYear(e.target.value)}
                           options={years}/>

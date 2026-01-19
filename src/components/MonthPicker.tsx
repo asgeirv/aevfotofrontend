@@ -15,6 +15,7 @@ export function MonthPicker({months, selectedMonth, setMonth}: MonthPickerProps)
         <div className="datepicker-container">
             <FloatLabel>
                 <Dropdown inputId="month-picker"
+                          variant="filled"
                           disabled={disabled}
                           value={selectedMonth}
                           onChange={e => setMonth(e.target.value)}

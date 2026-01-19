@@ -16,11 +16,11 @@ export function SubfolderPicker({subfolders, selectedSubfolder, setSelectedSubfo
             <div className="datepicker-container">
                 <FloatLabel>
                     <Dropdown inputId="subfolder-picker"
+                              variant="filled"
                               disabled={disabled}
                               value={selectedSubfolder}
                               onChange={e => setSelectedSubfolder(e.target.value)}
-                              options={subfolders}
-                              placeholder={selectedSubfolder}/>
+                              options={subfolders}/>
                     <label htmlFor="subfolder-picker">Subfolder</label>
                 </FloatLabel>
             </div>
