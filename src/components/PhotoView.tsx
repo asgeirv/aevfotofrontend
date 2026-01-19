@@ -53,7 +53,10 @@ export function PhotoView({photoIds}: PhotoViewProps) {
         <div id="image-container">
             <Card title={cardTitle}>
                 <>
-                    <Image src={"http://localhost:8080/api/photo/" + photoIds[currentPhoto]} width="100%"/>
+                    <div className="photo">
+                        <Image src={"http://localhost:8080/api/photo/" + photoIds[currentPhoto]}
+                               height="100%"/>
+                    </div>
                     <div id="photo-nav-container">
                         <Button icon="pi pi-arrow-left"
                                 onClick={previousPhoto}/>

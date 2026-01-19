@@ -31,8 +31,15 @@
 }
 
 #image-container {
-    width: 800px;
     padding-left: 0.2rem;
+}
+
+.photo {
+    width: 800px;
+    height: 533px;
+    display: flex;
+    align-content: center;
+    justify-content: center;
 }
 
 #photo-nav-container {
