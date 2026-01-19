@@ -8,11 +8,12 @@ import "primereact/resources/themes/bootstrap4-dark-purple/theme.css";
 import 'primeicons/primeicons.css';
 
 import {useEffect, useState} from 'react';
+import type {Photo} from "./models/Photo.ts";
 
 interface YearPickerProps {
-    years: string[];
-    selectedYear: string | undefined;
-    setYear: (year: string) => void;
+    years: number[];
+    selectedYear: number | undefined;
+    setYear: (year: number) => void;
 }
 
 interface MonthPickerProps {
@@ -24,53 +25,55 @@ interface MonthPickerProps {
 interface SubfolderPickerProps {
     subfolders: string[];
     selectedSubfolder: string | undefined;
-    setSubfolder: (subfolder: string) => void;
+    setSelectedSubfolder: (subfolder: string) => void;
 }
 
 interface PhotoViewProps {
-    year: string | undefined;
-    month: string | undefined;
-    subfolder: string;
+    photoIds: number[];
 }
 
 function App() {
-    const [years, setYears] = useState<string[]>([]);
-    const [selectedYear, setSelectedYear] = useState<string>();
+    const [photos, setPhotos] = useState<Photo[]>([]);
+    const [selectedYear, setSelectedYear] = useState<number>();
+    const [selectedMonth, setSelectedMonth] = useState<string>();
+    const [selectedSubfolder, setSelectedSubfolder] = useState<string | undefined>(undefined);
+
     useEffect(() => {
         fetch('http://localhost:8080/api/photos')
             .then(res => res.json())
-            .then(data => setYears(data))
+            .then(data => setPhotos(data))
             .catch(err => {
-                setYears([]);
+                setPhotos([]);
                 console.error(err)
             })
     }, []);
 
-    const [months, setMonths] = useState<string[]>([]);
-    const [selectedMonth, setSelectedMonth] = useState<string>();
-    useEffect(() => {
-        fetch(`http://localhost:8080/api/photos/${selectedYear}`)
-            .then(res => res.json())
-            .then(data => setMonths(data))
-            .catch(err => {
-                setMonths([]);
-                console.error(err);
-            });
-    });
+    const allYears: number[] = photos.map(photo => photo.year);
+    const yearSet = new Set<number>(allYears);
+    const years: number[] = [...yearSet]
 
-    const [subfolders, setSubfolders] = useState<string[]>([]);
-    const [subfolder, setSubfolder] = useState<string>("");
-    useEffect(() => {
-        if (selectedMonth) {
-            fetch(`http://localhost:8080/api/photos/${selectedYear}/${selectedMonth}/folders`)
-                .then(res => res.json())
-                .then(data => setSubfolders(data))
-                .catch(err => {
-                    setSubfolders([]);
-                    console.error(err);
-                });
-        }
-    });
+    const allMonths: string[] = photos
+        .filter(photo => photo.year === selectedYear)
+        .map(photo => photo.month);
+    const monthSet = new Set<string>(allMonths);
+    const months: string[] = [...monthSet];
+
+    const allSubfolders: string[] = photos
+        .filter(photo => photo.year === selectedYear && photo.month === selectedMonth && photo.subfolder)
+        .map(photo => photo.subfolder);
+    const subfolderSet = new Set<string>(allSubfolders);
+    const subfolders: string[] = [...subfolderSet];
+
+    let photoIds;
+    if (selectedSubfolder) {
+        photoIds = photos
+            .filter(photo => photo.year === selectedYear && photo.month === selectedMonth && photo.subfolder === selectedSubfolder)
+            .map(photo => photo.id);
+    } else {
+        photoIds = photos
+            .filter(photo => photo.year === selectedYear && photo.month === selectedMonth)
+            .map(photo => photo.id);
+    }
 
     return (
         <div className="root">
@@ -80,7 +83,7 @@ function App() {
                                 selectedYear={selectedYear}
                                 setYear={newYear => {
                                     setSelectedYear(newYear);
-                                    setSubfolder("");
+                                    setSelectedSubfolder("");
                                     if (months.length === 0) {
                                         setSelectedMonth(undefined);
                                     }
@@ -90,17 +93,15 @@ function App() {
                                  setMonth={newMonth => {
                                      setSelectedMonth(newMonth);
                                      if (subfolders.length === 0) {
-                                         setSubfolder("");
+                                         setSelectedSubfolder("");
                                      }
                                  }}/>
                     <SubfolderPicker subfolders={subfolders}
-                                     selectedSubfolder={selectedYear}
-                                     setSubfolder={newSubfolder => setSubfolder(newSubfolder)}/>
+                                     selectedSubfolder={selectedSubfolder}
+                                     setSelectedSubfolder={newSubfolder => setSelectedSubfolder(newSubfolder)}/>
                 </Card>
             </div>
-            <PhotoView year={selectedYear}
-                       month={selectedMonth}
-                       subfolder={subfolder}/>
+            <PhotoView photoIds={photoIds}/>
         </div>
     );
 }
@@ -124,15 +125,14 @@ function YearPicker({years, selectedYear, setYear}: YearPickerProps) {
 }
 
 function MonthPicker({months, selectedMonth, setMonth}: MonthPickerProps) {
-    if (!selectedMonth) {
-        setMonth(months[0]);
-    }
+    const options: string[] = months ? months : [];
+    const disabled: boolean = options.length === 0;
 
     return (
         <div className="datepicker-container">
             <FloatLabel>
                 <Dropdown inputId="month-picker"
-                          disabled={months.length === 0}
+                          disabled={disabled}
                           value={selectedMonth}
                           onChange={e => setMonth(e.target.value)}
                           options={months}
@@ -143,40 +143,35 @@ function MonthPicker({months, selectedMonth, setMonth}: MonthPickerProps) {
     )
 }
 
-function SubfolderPicker({subfolders, selectedSubfolder, setSubfolder}: SubfolderPickerProps) {
-    return (
-        <div className="datepicker-container">
-            <FloatLabel>
-                <Dropdown inputId="subfolder-picker"
-                          disabled={subfolders.length === 0}
-                          value={selectedSubfolder}
-                          onChange={e => setSubfolder(e.target.value)}
-                          options={subfolders}
-                          placeholder={selectedSubfolder}/>
-                <label htmlFor="subfolder-picker">Subfolder</label>
-            </FloatLabel>
-        </div>
-    );
+function SubfolderPicker({subfolders, selectedSubfolder, setSelectedSubfolder}: SubfolderPickerProps) {
+    const options: string[] = subfolders ? subfolders : [];
+    const disabled: boolean = options.length === 0;
+
+    if (subfolders[0]) {
+        return (
+            <div className="datepicker-container">
+                <FloatLabel>
+                    <Dropdown inputId="subfolder-picker"
+                              disabled={disabled}
+                              value={selectedSubfolder}
+                              onChange={e => setSelectedSubfolder(e.target.value)}
+                              options={subfolders}
+                              placeholder={selectedSubfolder}/>
+                    <label htmlFor="subfolder-picker">Subfolder</label>
+                </FloatLabel>
+            </div>
+        );
+    } else {
+        return null;
+    }
 }
 
-function PhotoView({year, month, subfolder}: PhotoViewProps) {
-    const [photoIds, setPhotoIds] = useState<number[]>();
+function PhotoView({photoIds}: PhotoViewProps) {
     const [currentPhoto, setCurrentPhoto] = useState<number>(0);
-    let url: string;
-    if (month) {
-        url = `http://localhost:8080/api/photos/${year}/${month}`;
+    if (currentPhoto > photoIds.length) {
+        setCurrentPhoto(0);
     }
-    if (subfolder) {
-        url = `http://localhost:8080/api/photos/${year}/${month}/${subfolder}`;
-    }
-    useEffect(() => {
-        if (month) {
-            fetch(url)
-                .then(res => res.json())
-                .then(data => setPhotoIds(data))
-                .catch(err => console.log(err));
-        }
-    });
+    const cardTitle = photoIds.length > 0 ? `Photo ${currentPhoto + 1} / ${photoIds.length}` : "No photos found!";
 
     function previousPhoto() {
         if (currentPhoto === 0) {
@@ -200,29 +195,24 @@ function PhotoView({year, month, subfolder}: PhotoViewProps) {
 
     return (
         <div id="image-container">
-            <Card>
-                {photoIds === undefined || photoIds.length === 0 ? (
-                    <p>No photos found!</p>
-                ) : (
-                    <>
-                        <p>{currentPhoto + 1}/{photoIds.length}</p>
-                        <Image src={"http://localhost:8080/api/photo/" + photoIds[currentPhoto]} width="100%"/>
-                        <div id="photo-nav-container">
-                            <Button icon="pi pi-arrow-left"
-                                    onClick={previousPhoto}/>
+            <Card title={cardTitle}>
+                <>
+                    <Image src={"http://localhost:8080/api/photo/" + photoIds[currentPhoto]} width="100%"/>
+                    <div id="photo-nav-container">
+                        <Button icon="pi pi-arrow-left"
+                                onClick={previousPhoto}/>
 
-                            <Rating/>
+                        <Rating/>
 
-                            <Button icon="pi pi-arrow-right"
-                                    onClick={nextPhoto}/>
-                        </div>
-                        <div id="photo-del-container">
-                            <Button icon="pi pi-trash"
-                                    severity="danger"
-                                    onClick={deletePhoto}/>
-                        </div>
-                    </>
-                )}
+                        <Button icon="pi pi-arrow-right"
+                                onClick={nextPhoto}/>
+                    </div>
+                    <div id="photo-del-container">
+                        <Button icon="pi pi-trash"
+                                severity="danger"
+                                onClick={deletePhoto}/>
+                    </div>
+                </>
             </Card>
         </div>
     )

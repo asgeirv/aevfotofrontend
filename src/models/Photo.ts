@@ -1,6 +1,9 @@
 export type Photo = {
     id: number;
-    name: string;
+    year: number;
+    month: string;
+    subfolder: string;
+    filename: string;
     rating: number;
     flaggedForDeletion: boolean;
 }
