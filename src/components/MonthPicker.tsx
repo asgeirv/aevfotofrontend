@@ -11,6 +11,10 @@ export function MonthPicker({months, selectedMonth, setMonth}: MonthPickerProps)
     const options: string[] = months ? months : [];
     const disabled: boolean = options.length === 0;
 
+    if (!selectedMonth && options) {
+        setMonth(options[0]);
+    }
+
     return (
         <div className="datepicker-container">
             <FloatLabel>
