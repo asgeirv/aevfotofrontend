@@ -28,18 +28,21 @@ function App() {
     const allYears: number[] = photos.map(photo => photo.year);
     const yearSet = new Set<number>(allYears);
     const years: number[] = [...yearSet]
+    years.sort();
 
     const allMonths: string[] = photos
         .filter(photo => photo.year === selectedYear)
         .map(photo => photo.month);
     const monthSet = new Set<string>(allMonths);
     const months: string[] = [...monthSet];
+    months.sort();
 
     const allSubfolders: string[] = photos
         .filter(photo => photo.year === selectedYear && photo.month === selectedMonth && photo.subfolder)
         .map(photo => photo.subfolder);
     const subfolderSet = new Set<string>(allSubfolders);
     const subfolders: string[] = [...subfolderSet];
+    subfolders.sort();
 
     let photoIds: number[];
     if (selectedSubfolder) {
