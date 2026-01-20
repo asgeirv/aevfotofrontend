@@ -54,10 +54,11 @@ export function PhotoView({photoIds}: PhotoViewProps) {
             <Card title={cardTitle}>
                 <>
                     <div className="photo">
-                        <Image src={"http://localhost:8080/api/photo/" + photoIds[currentPhoto]}
+                        <Image src={"http://localhost:8080/api/photo/" + photoIds[currentPhoto] + "/thumbnail"}
                                preview
+                               zoomSrc={"http://localhost:8080/api/photo/" + photoIds[currentPhoto]}
                                indicatorIcon="pi pi-search"
-                               height="100%"/>
+                               max-height="533"/>
                     </div>
                     <div id="photo-nav-container">
                         <Button icon="pi pi-arrow-left"
