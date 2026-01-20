@@ -44,15 +44,13 @@ function App() {
     const subfolders: string[] = [...subfolderSet];
     subfolders.sort();
 
-    let photoIds: number[];
+    let photosInFolder: Photo[];
     if (selectedSubfolder) {
-        photoIds = photos
-            .filter(photo => photo.year === selectedYear && photo.month === selectedMonth && photo.subfolder === selectedSubfolder)
-            .map(photo => photo.id);
+        photosInFolder = photos
+            .filter(photo => photo.year === selectedYear && photo.month === selectedMonth && photo.subfolder === selectedSubfolder);
     } else {
-        photoIds = photos
-            .filter(photo => photo.year === selectedYear && photo.month === selectedMonth)
-            .map(photo => photo.id);
+        photosInFolder = photos
+            .filter(photo => photo.year === selectedYear && photo.month === selectedMonth);
     }
 
     return (
@@ -81,7 +79,7 @@ function App() {
                                      setSelectedSubfolder={newSubfolder => setSelectedSubfolder(newSubfolder)}/>
                 </Card>
             </div>
-            <PhotoView photoIds={photoIds}/>
+            <PhotoView photos={photosInFolder}/>
         </div>
     );
 }
