@@ -1,16 +1,15 @@
 import {FloatLabel} from "primereact/floatlabel";
 import {Dropdown} from "primereact/dropdown";
+import type {Year} from "../models/Year.ts";
 
 interface YearPickerProps {
-    years: number[];
-    selectedYear: number | undefined;
-    setYear: (year: number) => void;
+    years: Year[];
+    selectedYear: Year | undefined;
+    setYear: (year: Year) => void;
 }
 
 export function YearPicker({years, selectedYear, setYear}: YearPickerProps) {
-    if (!selectedYear) {
-        setYear(years[0]);
-    }
+
 
     return (
         <div className="datepicker-container">
@@ -19,7 +18,8 @@ export function YearPicker({years, selectedYear, setYear}: YearPickerProps) {
                           variant="filled"
                           value={selectedYear}
                           onChange={e => setYear(e.target.value)}
-                          options={years}/>
+                          options={years}
+                          optionLabel="year"/>
                 <label htmlFor="year-picker">Year</label>
             </FloatLabel>
         </div>

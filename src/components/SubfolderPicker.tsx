@@ -1,31 +1,26 @@
 import {FloatLabel} from "primereact/floatlabel";
 import {Dropdown} from "primereact/dropdown";
+import type {Subfolder} from "../models/Subfolder.ts";
 
 interface SubfolderPickerProps {
-    subfolders: string[];
-    selectedSubfolder: string | undefined;
-    setSelectedSubfolder: (subfolder: string) => void;
+    subfolders: Subfolder[] | undefined;
+    selectedSubfolder: Subfolder | undefined;
+    setSelectedSubfolder: (subfolder: Subfolder) => void;
 }
 
 export function SubfolderPicker({subfolders, selectedSubfolder, setSelectedSubfolder}: SubfolderPickerProps) {
-    const options: string[] = subfolders ? subfolders : [];
-    const disabled: boolean = options.length === 0;
-
-    if (subfolders[0]) {
-        return (
-            <div className="datepicker-container">
-                <FloatLabel>
-                    <Dropdown inputId="subfolder-picker"
-                              variant="filled"
-                              disabled={disabled}
-                              value={selectedSubfolder}
-                              onChange={e => setSelectedSubfolder(e.target.value)}
-                              options={subfolders}/>
-                    <label htmlFor="subfolder-picker">Subfolder</label>
-                </FloatLabel>
-            </div>
-        );
-    } else {
-        return null;
-    }
+    return (
+        <div className="datepicker-container">
+            <FloatLabel>
+                <Dropdown inputId="subfolder-picker"
+                          variant="filled"
+                          disabled={!subfolders || subfolders.length == 0}
+                          value={selectedSubfolder?.name}
+                          onChange={e => setSelectedSubfolder(e.target.value)}
+                          options={subfolders}
+                          showClear/>
+                <label htmlFor="subfolder-picker">Subfolder</label>
+            </FloatLabel>
+        </div>
+    );
 }

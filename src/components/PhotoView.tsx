@@ -9,29 +9,34 @@ import type {Nullable} from "primereact/ts-helpers";
 import type {Photo} from "../models/Photo.ts";
 
 interface PhotoViewProps {
-    photos: Photo[];
+    photos: Photo[] | undefined;
 }
 
 export function PhotoView({photos}: PhotoViewProps) {
     const [currentPhoto, setCurrentPhoto] = useState<number>(0);
-    if (currentPhoto > photos.length) {
+
+    if (photos && currentPhoto > photos.length) {
         setCurrentPhoto(0);
     }
-    const cardTitle: string = photos.length > 0 ? `Photo ${currentPhoto + 1} / ${photos.length}` : "No photos found!";
+    const cardTitle: string = photos && photos.length > 0 ? `Photo ${currentPhoto + 1} / ${photos.length}` : "No photos found!";
 
     function previousPhoto() {
-        if (currentPhoto === 0) {
-            setCurrentPhoto(photos?.length - 1);
-        } else {
-            setCurrentPhoto(currentPhoto - 1);
+        if (photos) {
+            if (currentPhoto === 0) {
+                setCurrentPhoto(photos?.length - 1);
+            } else {
+                setCurrentPhoto(currentPhoto - 1);
+            }
         }
     }
 
     function nextPhoto() {
-        if (currentPhoto === photos?.length - 1) {
-            setCurrentPhoto(0);
-        } else {
-            setCurrentPhoto(currentPhoto + 1);
+        if (photos) {
+            if (currentPhoto === photos?.length - 1) {
+                setCurrentPhoto(0);
+            } else {
+                setCurrentPhoto(currentPhoto + 1);
+            }
         }
     }
 

@@ -1,30 +1,25 @@
 import {FloatLabel} from "primereact/floatlabel";
 import {Dropdown} from "primereact/dropdown";
+import type {Month} from "../models/Month.ts";
 
 interface MonthPickerProps {
-    months: string[];
-    selectedMonth: string | undefined;
-    setMonth: (month: string) => void;
+    months: Month[] | undefined;
+    selectedMonth: Month | undefined;
+    setMonth: (month: Month) => void;
 }
 
 export function MonthPicker({months, selectedMonth, setMonth}: MonthPickerProps) {
-    const options: string[] = months ? months : [];
-    const disabled: boolean = options.length === 0;
-
-    if (!selectedMonth && options) {
-        setMonth(options[0]);
-    }
-
     return (
         <div className="datepicker-container">
             <FloatLabel>
                 <Dropdown inputId="month-picker"
                           variant="filled"
-                          disabled={disabled}
-                          value={selectedMonth}
+                          disabled={!months || months.length == 0}
                           onChange={e => setMonth(e.target.value)}
+                          value={selectedMonth}
                           options={months}
-                          placeholder={selectedMonth}/>
+                          optionLabel={selectedMonth?.num.toString()}
+                          placeholder="Select month"/>
                 <label htmlFor="month-picker">Month</label>
             </FloatLabel>
         </div>

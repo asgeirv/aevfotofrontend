@@ -3,55 +3,29 @@ import 'primereact/resources/themes/bootstrap4-dark-purple/theme.css';
 import 'primeicons/primeicons.css';
 
 import {useEffect, useState} from 'react';
-import type {Photo} from './models/Photo.ts';
 import {YearPicker} from "./components/YearPicker.tsx";
 import {MonthPicker} from "./components/MonthPicker.tsx";
 import {SubfolderPicker} from "./components/SubfolderPicker.tsx";
 import {PhotoView} from "./components/PhotoView.tsx";
+import type {Year} from "./models/Year.ts";
+import type {Subfolder} from "./models/Subfolder.ts";
+import type {Month} from "./models/Month.ts";
 
 function App() {
-    const [photos, setPhotos] = useState<Photo[]>([]);
-    const [selectedYear, setSelectedYear] = useState<number>();
-    const [selectedMonth, setSelectedMonth] = useState<string>();
-    const [selectedSubfolder, setSelectedSubfolder] = useState<string | undefined>(undefined);
+    const [selectedYear, setSelectedYear] = useState<Year>();
+    const [years, setYears] = useState<Year[]>([]);
+    const [selectedMonth, setSelectedMonth] = useState<Month>();
+    const [selectedSubfolder, setSelectedSubfolder] = useState<Subfolder | undefined>(undefined);
 
     useEffect(() => {
         fetch('http://localhost:8080/api/photos')
             .then(res => res.json())
-            .then(data => setPhotos(data))
-            .catch(err => {
-                setPhotos([]);
-                console.error(err)
+            .then(data => {
+                setYears(data);
+                years.sort();
             })
+            .catch(err => console.log(err))
     }, []);
-
-    const allYears: number[] = photos.map(photo => photo.year);
-    const yearSet = new Set<number>(allYears);
-    const years: number[] = [...yearSet]
-    years.sort();
-
-    const allMonths: string[] = photos
-        .filter(photo => photo.year === selectedYear)
-        .map(photo => photo.month);
-    const monthSet = new Set<string>(allMonths);
-    const months: string[] = [...monthSet];
-    months.sort();
-
-    const allSubfolders: string[] = photos
-        .filter(photo => photo.year === selectedYear && photo.month === selectedMonth && photo.subfolder)
-        .map(photo => photo.subfolder);
-    const subfolderSet = new Set<string>(allSubfolders);
-    const subfolders: string[] = [...subfolderSet];
-    subfolders.sort();
-
-    let photosInFolder: Photo[];
-    if (selectedSubfolder) {
-        photosInFolder = photos
-            .filter(photo => photo.year === selectedYear && photo.month === selectedMonth && photo.subfolder === selectedSubfolder);
-    } else {
-        photosInFolder = photos
-            .filter(photo => photo.year === selectedYear && photo.month === selectedMonth);
-    }
 
     return (
         <div className="root">
@@ -59,27 +33,19 @@ function App() {
                 <Card>
                     <YearPicker years={years}
                                 selectedYear={selectedYear}
-                                setYear={newYear => {
-                                    setSelectedYear(newYear);
-                                    setSelectedSubfolder("");
-                                    if (months.length === 0) {
-                                        setSelectedMonth(undefined);
-                                    }
-                                }}/>
-                    <MonthPicker months={months}
-                                 selectedMonth={selectedMonth}
-                                 setMonth={newMonth => {
-                                     setSelectedMonth(newMonth);
-                                     if (subfolders.length === 0) {
-                                         setSelectedSubfolder("");
-                                     }
-                                 }}/>
-                    <SubfolderPicker subfolders={subfolders}
+                                setYear={setSelectedYear}/>
+
+                    <MonthPicker months={selectedYear?.months}
+                                 selectedMonth={selectedMonth ? selectedMonth : selectedYear?.months[0]}
+                                 setMonth={setSelectedMonth}/>
+
+                    <SubfolderPicker subfolders={selectedMonth?.subfolders}
                                      selectedSubfolder={selectedSubfolder}
-                                     setSelectedSubfolder={newSubfolder => setSelectedSubfolder(newSubfolder)}/>
+                                     setSelectedSubfolder={setSelectedSubfolder}/>
                 </Card>
             </div>
-            <PhotoView photos={photosInFolder}/>
+
+            <PhotoView photos={selectedMonth?.photos}/>
         </div>
     );
 }
