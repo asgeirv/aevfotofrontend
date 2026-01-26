@@ -9,17 +9,16 @@ interface YearPickerProps {
 }
 
 export function YearPicker({years, selectedYear, setYear}: YearPickerProps) {
-
-
     return (
         <div className="datepicker-container">
             <FloatLabel>
                 <Dropdown inputId="year-picker"
                           variant="filled"
-                          value={selectedYear}
                           onChange={e => setYear(e.target.value)}
+                          value={selectedYear}
                           options={years}
-                          optionLabel="year"/>
+                          optionLabel="year"
+                          placeholder="Select year"/>
                 <label htmlFor="year-picker">Year</label>
             </FloatLabel>
         </div>

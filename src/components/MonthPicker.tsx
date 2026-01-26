@@ -18,7 +18,7 @@ export function MonthPicker({months, selectedMonth, setMonth}: MonthPickerProps)
                           onChange={e => setMonth(e.target.value)}
                           value={selectedMonth}
                           options={months}
-                          optionLabel={selectedMonth?.num.toString()}
+                          optionLabel="num"
                           placeholder="Select month"/>
                 <label htmlFor="month-picker">Month</label>
             </FloatLabel>

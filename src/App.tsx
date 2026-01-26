@@ -36,7 +36,7 @@ function App() {
                                 setYear={setSelectedYear}/>
 
                     <MonthPicker months={selectedYear?.months}
-                                 selectedMonth={selectedMonth ? selectedMonth : selectedYear?.months[0]}
+                                 selectedMonth={selectedMonth}
                                  setMonth={setSelectedMonth}/>
 
                     <SubfolderPicker subfolders={selectedMonth?.subfolders}
@@ -45,7 +45,7 @@ function App() {
                 </Card>
             </div>
 
-            <PhotoView photos={selectedMonth?.photos}/>
+            <PhotoView photos={selectedSubfolder ? selectedSubfolder.photos : selectedMonth?.photos}/>
         </div>
     );
 }
