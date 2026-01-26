@@ -13,29 +13,30 @@ interface PhotoViewProps {
 }
 
 export function PhotoView({photos}: PhotoViewProps) {
-    const [currentPhoto, setCurrentPhoto] = useState<number>(0);
+    const [currentId, setCurrentId] = useState<number>(0);
+    const [count, setCount] = useState<number>(0);
 
-    if (photos && currentPhoto > photos.length) {
-        setCurrentPhoto(0);
+    if (photos && currentId > photos.length) {
+        setCurrentId(0);
     }
-    const cardTitle: string = photos && photos.length > 0 ? `Photo ${currentPhoto + 1} / ${photos.length}` : "No photos found!";
+    const cardTitle: string = photos && photos.length > 0 ? `Photo ${currentId + 1} / ${photos.length}` : "No photos found!";
 
     function previousPhoto() {
         if (photos) {
-            if (currentPhoto === 0) {
-                setCurrentPhoto(photos?.length - 1);
+            if (currentId === 0) {
+                setCurrentId(photos?.length - 1);
             } else {
-                setCurrentPhoto(currentPhoto - 1);
+                setCurrentId(currentId - 1);
             }
         }
     }
 
     function nextPhoto() {
         if (photos) {
-            if (currentPhoto === photos?.length - 1) {
-                setCurrentPhoto(0);
+            if (currentId === photos?.length - 1) {
+                setCurrentId(0);
             } else {
-                setCurrentPhoto(currentPhoto + 1);
+                setCurrentId(currentId + 1);
             }
         }
     }
@@ -60,6 +61,8 @@ export function PhotoView({photos}: PhotoViewProps) {
             })
             .catch(err => console.log(err));
 
+        // force update
+        setCount(count + 1);
     }
 
     function deletePhoto() {
@@ -84,9 +87,9 @@ export function PhotoView({photos}: PhotoViewProps) {
                 {photos && photos.length > 0 ? (
                     <>
                         <div className="photo">
-                            <Image src={"http://localhost:8080/api/photo/" + photos[currentPhoto].id + "/thumbnail"}
+                            <Image src={"http://localhost:8080/api/photo/" + photos[currentId].id + "/thumbnail"}
                                    preview
-                                   zoomSrc={"http://localhost:8080/api/photo/" + photos[currentPhoto].id}
+                                   zoomSrc={"http://localhost:8080/api/photo/" + photos[currentId].id}
                                    indicatorIcon="pi pi-search"
                                    max-height="533"/>
                         </div>
@@ -94,8 +97,8 @@ export function PhotoView({photos}: PhotoViewProps) {
                             <Button icon="pi pi-arrow-left"
                                     onClick={previousPhoto}/>
 
-                            <Rating value={photos[currentPhoto].rating}
-                                    onChange={(e) => updateRating(photos[currentPhoto], e.value)}/>
+                            <Rating value={photos[currentId].rating}
+                                    onChange={(e) => updateRating(photos[currentId], e.value)}/>
 
                             <Button icon="pi pi-arrow-right"
                                     onClick={nextPhoto}/>
