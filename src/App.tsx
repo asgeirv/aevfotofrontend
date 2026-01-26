@@ -7,6 +7,7 @@ import {YearPicker} from "./components/YearPicker.tsx";
 import {MonthPicker} from "./components/MonthPicker.tsx";
 import {SubfolderPicker} from "./components/SubfolderPicker.tsx";
 import {PhotoView} from "./components/PhotoView.tsx";
+import {PortfolioView} from "./components/PortfolioView.tsx";
 import type {Year} from "./models/Year.ts";
 import type {Subfolder} from "./models/Subfolder.ts";
 import type {Month} from "./models/Month.ts";
@@ -29,8 +30,12 @@ function App() {
 
     return (
         <div className="root">
-            <div id="date-nav-container">
-                <Card>
+            <div id="nav">
+                <Card id="portfolio">
+                    <PortfolioView/>
+                </Card>
+
+                <Card id="date-nav">
                     <YearPicker years={years}
                                 selectedYear={selectedYear}
                                 setYear={setSelectedYear}/>

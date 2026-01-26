@@ -20,10 +20,14 @@
     justify-content: center;
 }
 
-#date-nav-container {
+#nav {
     min-width: 15rem;
     height: 100%;
     padding-right: 0.2rem;
+}
+
+#portfolio {
+    margin-bottom: 0.5rem;
 }
 
 .datepicker-container {
@@ -32,6 +36,21 @@
 
 #image-container {
     padding-left: 0.2rem;
+}
+
+#portfolio-grid {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+.portfolio-img {
+    padding: 0.5rem;
+}
+
+.portfolio-thumbnail {
+    cursor: pointer;
+    max-height: 100px;
 }
 
 .photo {
