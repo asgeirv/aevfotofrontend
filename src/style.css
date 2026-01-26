@@ -20,14 +20,26 @@
     justify-content: center;
 }
 
+.app-container {
+    display: flex;
+    flex-direction: row;
+    width: 50%;
+}
+
 #nav {
     min-width: 15rem;
     height: 100%;
     padding-right: 0.2rem;
 }
 
-#portfolio {
+#photo-handling-card {
     margin-bottom: 0.5rem;
+}
+
+#photo-handling {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
 }
 
 .datepicker-container {
@@ -36,6 +48,7 @@
 
 #image-container {
     padding-left: 0.2rem;
+    flex-grow: 1;
 }
 
 #portfolio-grid {

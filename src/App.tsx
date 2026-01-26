@@ -11,6 +11,7 @@ import {PortfolioView} from "./components/PortfolioView.tsx";
 import type {Year} from "./models/Year.ts";
 import type {Subfolder} from "./models/Subfolder.ts";
 import type {Month} from "./models/Month.ts";
+import {DeletionView} from "./components/DeletionView.tsx";
 
 function App() {
     const [selectedYear, setSelectedYear] = useState<Year>();
@@ -26,31 +27,36 @@ function App() {
                 years.sort();
             })
             .catch(err => console.log(err))
-    }, []);
+    }, [years]);
 
     return (
         <div className="root">
-            <div id="nav">
-                <Card id="portfolio">
-                    <PortfolioView/>
-                </Card>
+            <div className="app-container">
+                <div id="nav">
+                    <Card id="photo-handling-card">
+                        <div id="photo-handling">
+                            <PortfolioView/>
+                            <DeletionView/>
+                        </div>
+                    </Card>
 
-                <Card id="date-nav">
-                    <YearPicker years={years}
-                                selectedYear={selectedYear}
-                                setYear={setSelectedYear}/>
+                    <Card id="date-nav">
+                        <YearPicker years={years}
+                                    selectedYear={selectedYear}
+                                    setYear={setSelectedYear}/>
 
-                    <MonthPicker months={selectedYear?.months}
-                                 selectedMonth={selectedMonth}
-                                 setMonth={setSelectedMonth}/>
+                        <MonthPicker months={selectedYear?.months}
+                                     selectedMonth={selectedMonth}
+                                     setMonth={setSelectedMonth}/>
 
-                    <SubfolderPicker subfolders={selectedMonth?.subfolders}
-                                     selectedSubfolder={selectedSubfolder}
-                                     setSelectedSubfolder={setSelectedSubfolder}/>
-                </Card>
+                        <SubfolderPicker subfolders={selectedMonth?.subfolders}
+                                         selectedSubfolder={selectedSubfolder}
+                                         setSelectedSubfolder={setSelectedSubfolder}/>
+                    </Card>
+                </div>
+
+                <PhotoView photos={selectedSubfolder ? selectedSubfolder.photos : selectedMonth?.photos}/>
             </div>
-
-            <PhotoView photos={selectedSubfolder ? selectedSubfolder.photos : selectedMonth?.photos}/>
         </div>
     );
 }

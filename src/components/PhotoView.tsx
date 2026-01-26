@@ -65,8 +65,21 @@ export function PhotoView({photos}: PhotoViewProps) {
         setCount(count + 1);
     }
 
-    function deletePhoto() {
+    function toggleDeletion(photo: Photo) {
+        photo.flaggedForDeletion = !photo.flaggedForDeletion;
 
+        fetch(`http://localhost:8080/api/photo`,
+            {
+                method: "POST",
+                body: JSON.stringify(photo),
+                headers: {
+                    "Content-type": "application/json"
+                }
+            })
+            .catch(err => console.log(err));
+
+        // force update
+        setCount(count + 1);
     }
 
     function onKeyDown(e: React.KeyboardEvent) {
@@ -104,9 +117,9 @@ export function PhotoView({photos}: PhotoViewProps) {
                                     onClick={nextPhoto}/>
                         </div>
                         <div id="photo-del-container">
-                            <Button icon="pi pi-trash"
+                            <Button icon={photos[currentId].flaggedForDeletion ? "pi pi-undo" : "pi pi-trash"}
                                     severity="danger"
-                                    onClick={deletePhoto}/>
+                                    onClick={() => toggleDeletion(photos[currentId])}/>
                         </div>
                     </>
                 ) : (
