@@ -42,6 +42,10 @@ export function PhotoView({photos}: PhotoViewProps) {
         }
     }
 
+    function getCurrentPhoto(): Photo {
+        return photos[currentId];
+    }
+
     function updateRating(photo: Photo, rating: Nullable<number>) {
         if (rating === undefined) {
             console.error("Undefined rating!");
@@ -60,7 +64,7 @@ export function PhotoView({photos}: PhotoViewProps) {
         updatePhoto(photo);
     }
 
-    function updatePhoto (photo: Photo) {
+    function updatePhoto(photo: Photo) {
         fetch(`http://localhost:8080/api/photo`,
             {
                 method: "POST",
@@ -76,14 +80,48 @@ export function PhotoView({photos}: PhotoViewProps) {
     }
 
     function onKeyDown(e: React.KeyboardEvent) {
-        if (e.key === 'ArrowLeft') {
-            previousPhoto();
-        } else if (e.key === 'ArrowRight') {
-            nextPhoto();
-        } else if (e.key === 'Delete') {
-            if (photos && photos.length > 0) {
-                toggleDeletion(photos[currentId]);
-            }
+        switch (e.key) {
+            case "ArrowLeft":
+                previousPhoto();
+                break;
+            case "ArrowRight":
+                nextPhoto();
+                break;
+            case "Delete":
+                if (photos && photos.length > 0) {
+                    toggleDeletion(getCurrentPhoto());
+                }
+                break;
+            case "0":
+                if (photos && photos.length > 0) {
+                    updateRating(getCurrentPhoto(), 0);
+                }
+                break;
+            case "1":
+                if (photos && photos.length > 0) {
+                    updateRating(getCurrentPhoto(), 1);
+                }
+                break;
+            case "2":
+                if (photos && photos.length > 0) {
+                    updateRating(getCurrentPhoto(), 2);
+                }
+                break;
+            case "3":
+                if (photos && photos.length > 0) {
+                    updateRating(getCurrentPhoto(), 3);
+                }
+                break;
+            case "4":
+                if (photos && photos.length > 0) {
+                    updateRating(getCurrentPhoto(), 4);
+                }
+                break;
+            case "5":
+                if (photos && photos.length > 0) {
+                    updateRating(getCurrentPhoto(), 5);
+                }
+                break;
         }
     }
 
@@ -97,9 +135,9 @@ export function PhotoView({photos}: PhotoViewProps) {
                 {photos && photos.length > 0 ? (
                     <>
                         <div className="photo">
-                            <Image src={"http://localhost:8080/api/photo/" + photos[currentId].id + "/thumbnail"}
+                            <Image src={"http://localhost:8080/api/photo/" + getCurrentPhoto().id + "/thumbnail"}
                                    preview
-                                   zoomSrc={"http://localhost:8080/api/photo/" + photos[currentId].id}
+                                   zoomSrc={"http://localhost:8080/api/photo/" + getCurrentPhoto().id}
                                    indicatorIcon="pi pi-search"
                                    max-height="533"/>
                         </div>
@@ -110,7 +148,7 @@ export function PhotoView({photos}: PhotoViewProps) {
                                     tooltipOptions={{position: "right"}}/>
 
                             <Rating value={photos[currentId].rating}
-                                    onChange={(e) => updateRating(photos[currentId], e.value)}/>
+                                    onChange={(e) => updateRating(getCurrentPhoto(), e.value)}/>
 
                             <Button icon="pi pi-arrow-right"
                                     onClick={nextPhoto}
@@ -120,7 +158,7 @@ export function PhotoView({photos}: PhotoViewProps) {
                         <div id="photo-del-container">
                             <Button icon={photos[currentId].flaggedForDeletion ? "pi pi-undo" : "pi pi-trash"}
                                     severity="danger"
-                                    onClick={() => toggleDeletion(photos[currentId])}
+                                    onClick={() => toggleDeletion(getCurrentPhoto())}
                                     tooltip="Mark for deletion (Del)"
                                     tooltipOptions={{position: "bottom"}}/>
                         </div>
