@@ -87,6 +87,10 @@ export function PhotoView({photos}: PhotoViewProps) {
             previousPhoto();
         } else if (e.key === 'ArrowRight') {
             nextPhoto();
+        } else if (e.key === 'Delete') {
+            if (photos && photos.length > 0) {
+                toggleDeletion(photos[currentId]);
+            }
         }
     }
 
