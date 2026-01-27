@@ -112,18 +112,24 @@ export function PhotoView({photos}: PhotoViewProps) {
                         </div>
                         <div id="photo-nav-container">
                             <Button icon="pi pi-arrow-left"
-                                    onClick={previousPhoto}/>
+                                    onClick={previousPhoto}
+                                    tooltip="Previous photo (Arrow Key Left)"
+                                    tooltipOptions={{position: "right"}}/>
 
                             <Rating value={photos[currentId].rating}
                                     onChange={(e) => updateRating(photos[currentId], e.value)}/>
 
                             <Button icon="pi pi-arrow-right"
-                                    onClick={nextPhoto}/>
+                                    onClick={nextPhoto}
+                                    tooltip="Next photo (Arrow Key Right)"
+                                    tooltipOptions={{position: "left"}}/>
                         </div>
                         <div id="photo-del-container">
                             <Button icon={photos[currentId].flaggedForDeletion ? "pi pi-undo" : "pi pi-trash"}
                                     severity="danger"
-                                    onClick={() => toggleDeletion(photos[currentId])}/>
+                                    onClick={() => toggleDeletion(photos[currentId])}
+                                    tooltip="Mark for deletion (Del)"
+                                    tooltipOptions={{position: "bottom"}}/>
                         </div>
                     </>
                 ) : (
