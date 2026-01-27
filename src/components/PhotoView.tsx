@@ -13,6 +13,7 @@ interface PhotoViewProps {
 }
 
 export function PhotoView({photos}: PhotoViewProps) {
+    photos?.sort((a: Photo, b: Photo) => (a.filename < b.filename) ? -1 : (a.filename > b.filename) ? 1 : 0);
     const [currentId, setCurrentId] = useState<number>(0);
     const [count, setCount] = useState<number>(0);
 
