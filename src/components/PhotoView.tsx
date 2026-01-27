@@ -52,23 +52,15 @@ export function PhotoView({photos}: PhotoViewProps) {
             photo.rating = rating;
         }
 
-        fetch(`http://localhost:8080/api/photo`,
-            {
-                method: "POST",
-                body: JSON.stringify(photo),
-                headers: {
-                    "Content-type": "application/json"
-                }
-            })
-            .catch(err => console.log(err));
-
-        // force update
-        setCount(count + 1);
+        updatePhoto(photo);
     }
 
     function toggleDeletion(photo: Photo) {
         photo.flaggedForDeletion = !photo.flaggedForDeletion;
+        updatePhoto(photo);
+    }
 
+    function updatePhoto (photo: Photo) {
         fetch(`http://localhost:8080/api/photo`,
             {
                 method: "POST",
