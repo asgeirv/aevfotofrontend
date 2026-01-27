@@ -18,6 +18,19 @@ export function PortfolioView() {
             .catch((err) => console.log(err));
     }, [ratingThreshold]);
 
+    function downloadPortfolio() {
+        fetch(`http://localhost:8080/api/portfolio/dl/${ratingThreshold}`)
+            .then(res => res.blob())
+            .then((blob) => {
+                const fileUrl = URL.createObjectURL(blob);
+                const link = document.createElement("a");
+                link.href = fileUrl;
+                link.download = "portfolio.zip";
+                link.click();
+                link.parentNode?.removeChild(link);
+            })
+    }
+
     return (
         <div>
             <Button type="button"
@@ -27,14 +40,22 @@ export function PortfolioView() {
             />
             <OverlayPanel ref={portfolio}
                           style={{maxWidth: "70%"}}>
-                <div style={{marginBottom: "1rem"}}>
-                    Rating threshold:
-                    <Dropdown value={ratingThreshold}
-                              style={{marginLeft: "0.5rem"}}
-                              onChange={(e) => {
-                                  setRatingThreshold(e.target.value);
-                              }}
-                              options={availableRatings}/>
+                <div id="rating-container">
+                    <div>
+                        Rating threshold:
+                        <Dropdown value={ratingThreshold}
+                                  style={{marginLeft: "0.5rem"}}
+                                  onChange={(e) => {
+                                      setRatingThreshold(e.target.value);
+                                  }}
+                                  options={availableRatings}/>
+                    </div>
+
+                    <Button type="button"
+                            icon="pi pi-download"
+                            onClick={downloadPortfolio}
+                            tooltip="Download"
+                            tooltipOptions={{position: "top"}}/>
                 </div>
 
                 <PhotoTable photos={photos}
