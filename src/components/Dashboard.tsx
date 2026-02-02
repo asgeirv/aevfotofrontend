@@ -9,12 +9,17 @@ import {YearPicker} from "./YearPicker.tsx";
 import {MonthPicker} from "./MonthPicker.tsx";
 import {SubfolderPicker} from "./SubfolderPicker.tsx";
 import {PhotoView} from "./PhotoView.tsx";
+import {useNavigate} from "react-router-dom";
+import useToken from "../hooks/useToken.tsx";
+import {Button} from "primereact/button";
 
-export function NavView() {
+export function Dashboard() {
     const [selectedYear, setSelectedYear] = useState<Year>();
     const [years, setYears] = useState<Year[]>([]);
     const [selectedMonth, setSelectedMonth] = useState<Month>();
     const [selectedSubfolder, setSelectedSubfolder] = useState<Subfolder | undefined>(undefined);
+    const navigate = useNavigate();
+    const {removeToken} = useToken();
 
     useEffect(() => {
         fetch('http://localhost:8080/api/photos')
@@ -26,6 +31,11 @@ export function NavView() {
             .catch(err => console.log(err))
     }, [years]);
 
+    const handleLogout: () => void = () => {
+        removeToken();
+        navigate("/login");
+    }
+
     return (
         <>
             <div id="nav">
@@ -33,6 +43,9 @@ export function NavView() {
                     <div id="photo-handling">
                         <PortfolioView/>
                         <DeletionView/>
+
+                        <Button icon="pi pi-sign-out"
+                                onClick={() => handleLogout()}/>
                     </div>
                 </Card>
 
