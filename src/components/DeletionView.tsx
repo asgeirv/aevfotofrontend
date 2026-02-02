@@ -54,7 +54,7 @@ export function DeletionView() {
                         severity="danger"
                         size="large"
                         onClick={confirmNuke}
-                        style={{width: "100%"}}/>
+                        className="full-width"/>
             </OverlayPanel>
         </div>
     )
