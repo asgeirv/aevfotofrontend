@@ -1,11 +1,10 @@
 import {FloatLabel} from "primereact/floatlabel";
 import {Dropdown} from "primereact/dropdown";
-import type {Month} from "../models/Month.ts";
 
 interface MonthPickerProps {
-    months: Month[] | undefined;
-    selectedMonth: Month | undefined;
-    setMonth: (month: Month) => void;
+    months: number[] | undefined;
+    selectedMonth: number | undefined;
+    setMonth: (month: number) => void;
 }
 
 export function MonthPicker({months, selectedMonth, setMonth}: MonthPickerProps) {

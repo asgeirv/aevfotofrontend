@@ -1,11 +1,10 @@
 import {FloatLabel} from "primereact/floatlabel";
 import {Dropdown} from "primereact/dropdown";
-import type {Year} from "../models/Year.ts";
 
 interface YearPickerProps {
-    years: Year[];
-    selectedYear: Year | undefined;
-    setYear: (year: Year) => void;
+    years: number[];
+    selectedYear: number | undefined;
+    setYear: (year: number) => void;
 }
 
 export function YearPicker({years, selectedYear, setYear}: YearPickerProps) {

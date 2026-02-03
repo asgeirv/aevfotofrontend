@@ -43,7 +43,11 @@ export function PhotoView({photos}: PhotoViewProps) {
     }
 
     function getCurrentPhoto(): Photo {
-        return photos[currentId];
+        if (photos && photos.length > 0) {
+            return photos[currentId]
+        } else {
+            throw new Error("No photos found!");
+        }
     }
 
     function updateRating(photo: Photo, rating: Nullable<number>) {
