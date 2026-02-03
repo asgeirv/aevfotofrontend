@@ -36,6 +36,7 @@ export function PortfolioView() {
             <Button type="button"
                     icon="pi pi-image"
                     label="Portfolio"
+                    style={{marginRight: "1rem"}}
                     onClick={(e) => portfolio.current?.toggle(e)}
             />
             <OverlayPanel ref={portfolio}

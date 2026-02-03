@@ -30,28 +30,32 @@ function App() {
     }, [years]);
 
     return (
-        <div className="root">
+        <div className="wrapper">
             <div className="app-container">
-                <div id="nav">
-                    <Card id="photo-handling-card">
-                        <div id="photo-handling">
+                <div className="nav">
+                    <Card id="buttons"
+                        className="photo-handling-card">
+                        <div className="photo-handling">
                             <PortfolioView/>
                             <DeletionView/>
                         </div>
                     </Card>
 
-                    <Card id="date-nav">
-                        <YearPicker years={years}
-                                    selectedYear={selectedYear}
-                                    setYear={setSelectedYear}/>
+                    <Card id="dropdowns"
+                        className="photo-handling-card">
+                        <div className="date-nav">
+                            <YearPicker years={years}
+                                        selectedYear={selectedYear}
+                                        setYear={setSelectedYear}/>
 
-                        <MonthPicker months={selectedYear?.months}
-                                     selectedMonth={selectedMonth}
-                                     setMonth={setSelectedMonth}/>
+                            <MonthPicker months={selectedYear?.months}
+                                         selectedMonth={selectedMonth}
+                                         setMonth={setSelectedMonth}/>
 
-                        <SubfolderPicker subfolders={selectedMonth?.subfolders}
-                                         selectedSubfolder={selectedSubfolder}
-                                         setSelectedSubfolder={setSelectedSubfolder}/>
+                            <SubfolderPicker subfolders={selectedMonth?.subfolders}
+                                             selectedSubfolder={selectedSubfolder}
+                                             setSelectedSubfolder={setSelectedSubfolder}/>
+                        </div>
                     </Card>
                 </div>
 

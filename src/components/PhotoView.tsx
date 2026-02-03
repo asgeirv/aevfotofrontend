@@ -134,13 +134,16 @@ export function PhotoView({photos}: PhotoViewProps) {
             <Card title={cardTitle}>
                 {photos && photos.length > 0 ? (
                     <>
-                        <div className="photo">
-                            <Image src={"http://localhost:8080/api/photo/" + getCurrentPhoto().id + "/thumbnail"}
-                                   preview
-                                   zoomSrc={"http://localhost:8080/api/photo/" + getCurrentPhoto().id}
-                                   indicatorIcon="pi pi-search"
-                                   max-height="533"/>
+                        <div className="photo-container">
+                            <div className="photo">
+                                <Image src={"http://localhost:8080/api/photo/" + getCurrentPhoto().id + "/thumbnail"}
+                                       preview
+                                       zoomSrc={"http://localhost:8080/api/photo/" + getCurrentPhoto().id}
+                                       indicatorIcon="pi pi-search"
+                                       className="photo"/>
+                            </div>
                         </div>
+
                         <div id="photo-nav-container">
                             <Button icon="pi pi-arrow-left"
                                     onClick={previousPhoto}
@@ -155,6 +158,7 @@ export function PhotoView({photos}: PhotoViewProps) {
                                     tooltip="Next photo (Arrow Key Right)"
                                     tooltipOptions={{position: "left"}}/>
                         </div>
+
                         <div id="photo-del-container">
                             <Button icon={photos[currentId].flaggedForDeletion ? "pi pi-undo" : "pi pi-trash"}
                                     severity="danger"
