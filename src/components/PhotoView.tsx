@@ -83,7 +83,7 @@ export function PhotoView({photos}: PhotoViewProps) {
         setCount(count + 1);
     }
 
-    function onKeyDown(e: React.KeyboardEvent) {
+    function onKeyDown(e: React.KeyboardEvent): void {
         switch (e.key) {
             case "ArrowLeft":
                 previousPhoto();
@@ -129,7 +129,7 @@ export function PhotoView({photos}: PhotoViewProps) {
         }
     }
 
-    useGlobalKeydown((e: React.KeyboardEvent) => {
+    useGlobalKeydown((e: React.KeyboardEvent): void => {
         onKeyDown(e);
     })
 
