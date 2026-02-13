@@ -1,25 +1,27 @@
+ARG NODE_VERSION=24.12-alpine
+
 # Build stage
-FROM node:22-alpine AS build
+FROM node:${NODE_VERSION} AS build
 
 WORKDIR /app
 
 COPY package.json package-lock.json ./
-RUN npm install --frozen-lockfile
+RUN npm install
 COPY . .
 RUN npm run build
 
 # Dev environment
-FROM node:22-alpine AS dev
+FROM node:${NODE_VERSION} AS dev
 
 WORKDIR /app
 
 COPY package.json package-lock.json ./
-RUN npm install --frozen-lockfile
+RUN npm install
 
-COPY . .
+COPY . ./
 
-EXPOSE 3000
-CMD ["npm","start"]
+EXPOSE 5173
+CMD ["npm","run","dev"]
 
 # Production environment
 FROM nginx:stable-alpine AS prod

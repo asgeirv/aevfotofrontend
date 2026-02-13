@@ -1,0 +1,19 @@
+services:
+  backend:
+    container_name: aevfoto_backend_debug
+    ports:
+      - "8080:8080"
+      - "5005:5005"
+
+  frontend:
+    container_name: aevfoto_frontend_dev
+    image: aevfoto_frontend_dev
+    depends_on:
+      - backend
+    ports:
+      - "5173:5173"
+    develop:
+      watch:
+        - action: sync
+          path: .
+          target: /app

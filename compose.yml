@@ -1,0 +1,39 @@
+services:
+  db:
+    container_name: aevfoto_db
+    image: mariadb
+    volumes:
+      - ${DB_PATH}:/var/lib/mysql
+      - ${INIT_PATH}:/docker-entrypoint-initdb.d
+    restart: always
+    secrets:
+      - dbpw
+    environment:
+      MARIADB_USER: root
+      MARIADB_ROOT_PASSWORD:
+      MARIADB_DATABASE: aevfoto
+
+  backend:
+    image: aevfoto
+    depends_on:
+      - db
+    volumes:
+      - ${PHOTOS_PATH}:/photos
+    restart: always
+    secrets:
+      - dbpw
+    environment:
+      AEV_FOTO_USER: root
+      AEV_FOTO_PW:
+      AEV_FOTO_IMG_ROOT: /photos/
+      JAVA_TOOL_OPTIONS: "-agentlib:jdwp=transport=dt_socket,address=*:5005,server=y,suspend=n"
+
+  frontend:
+    container_name: aevfoto_frontend
+    image: aevfoto_frontend
+    depends_on:
+      - backend
+
+secrets:
+  dbpw:
+    file: pw.txt
