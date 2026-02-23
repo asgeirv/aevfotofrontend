@@ -130,7 +130,19 @@
 .photo-handling {
     display: flex;
     flex-direction: row;
-    justify-content: space-between;
+}
+
+.nav-buttons {
+    flex-grow: 1;
+    padding-right: 2rem;
+}
+
+.logout-button {
+    flex-shrink: 1;
+}
+
+.nav-button {
+    width: 100%;
 }
 
 #portfolio-grid {

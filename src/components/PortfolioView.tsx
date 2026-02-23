@@ -34,9 +34,10 @@ export function PortfolioView() {
     return (
         <div>
             <Button type="button"
+                    className="nav-button"
                     icon="pi pi-image"
                     label="Portfolio"
-                    style={{marginRight: "1rem"}}
+                    style={{marginBottom: "1rem"}}
                     onClick={(e) => portfolio.current?.toggle(e)}
             />
             <OverlayPanel ref={portfolio}

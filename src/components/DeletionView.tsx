@@ -41,7 +41,9 @@ export function DeletionView() {
     return (
         <div>
             <Button type="button"
+                    className="nav-button"
                     icon="pi pi-trash"
+                    label="Wastebin"
                     onClick={(e) => deleted.current?.toggle(e)}/>
 
             <OverlayPanel ref={deleted}>

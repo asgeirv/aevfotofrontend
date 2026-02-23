@@ -8,6 +8,7 @@ import {PhotoView} from "./components/PhotoView.tsx";
 import {useEffect, useState} from "react";
 import type {Photo} from "./models/Photo.ts";
 import {type AuthStuff, useAuth} from "./hooks/useAuth.tsx";
+import {Button} from "primereact/button";
 
 export default function AppPage() {
     const authStuff: AuthStuff = useAuth();
@@ -71,8 +72,15 @@ export default function AppPage() {
                 <Card id="buttons"
                       className="photo-handling-card">
                     <div className="photo-handling">
-                        <PortfolioView/>
-                        <DeletionView/>
+                        <div className="nav-buttons">
+                            <PortfolioView/>
+                            <DeletionView/>
+                        </div>
+
+                        <div className="logout-button">
+                            <Button icon="pi pi-sign-out"
+                            onClick={() => authStuff.logout()}/>
+                        </div>
                     </div>
                 </Card>
 
