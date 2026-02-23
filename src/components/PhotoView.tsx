@@ -1,5 +1,5 @@
 import * as React from "react";
-import {useState} from "react";
+import {useCallback, useEffect, useState} from "react";
 import {useGlobalKeydown} from "../KeyBoardEvents.tsx";
 import {Card} from "primereact/card";
 import {Image} from "primereact/image";
@@ -16,6 +16,10 @@ export function PhotoView({photos}: PhotoViewProps) {
     photos?.sort((a: Photo, b: Photo) => (a.filename < b.filename) ? -1 : (a.filename > b.filename) ? 1 : 0);
     const [currentId, setCurrentId] = useState<number>(0);
     const [count, setCount] = useState<number>(0);
+    const [thumbImg, setThumbImg] = useState<string>();
+    const [largeImg, setLargeImg] = useState<string>();
+    const headers = new Headers();
+    headers.set('Authorization', `Bearer ${localStorage.getItem("token")}`);
 
     if (photos && currentId > photos.length) {
         setCurrentId(0);
@@ -42,13 +46,13 @@ export function PhotoView({photos}: PhotoViewProps) {
         }
     }
 
-    function getCurrentPhoto(): Photo {
+    const getCurrentPhoto: () => Photo = useCallback((): Photo => {
         if (photos && photos.length > 0) {
             return photos[currentId]
         } else {
             throw new Error("No photos found!");
         }
-    }
+    }, [currentId, photos]);
 
     function updateRating(photo: Photo, rating: Nullable<number>) {
         if (rating === undefined) {
@@ -82,6 +86,37 @@ export function PhotoView({photos}: PhotoViewProps) {
         // force update
         setCount(count + 1);
     }
+
+    function arrayBufferToBase64(buffer: ArrayBuffer): string {
+        console.log(buffer)
+        return btoa(String.fromCharCode(...new Uint8Array(buffer)));
+    }
+
+    useEffect(() => {
+        if (photos && photos.length > 0) {
+            fetch(`http://localhost:8080/api/photo/${getCurrentPhoto().id}/thumbnail`,
+                {headers})
+                .then((res: Response): Promise<ArrayBuffer> => res.arrayBuffer())
+                .then((data: ArrayBuffer): void => {
+                    const base64: string = arrayBufferToBase64(data);
+                    setThumbImg(`data:image/jpg;base64,${base64}`);
+                })
+                .catch(err => console.log(err));
+        }
+    }, [photos, headers, thumbImg, getCurrentPhoto]);
+
+    useEffect(() => {
+        if (photos && photos.length > 0) {
+            fetch(`http://localhost:8080/api/photo/${getCurrentPhoto().id}`,
+                {headers})
+                .then((res: Response): Promise<ArrayBuffer> => res.arrayBuffer())
+                .then((data: ArrayBuffer): void => {
+                    const base64: string = arrayBufferToBase64(data);
+                    setLargeImg(`data:image/jpg;base64,${base64}`);
+                })
+                .catch(err => console.log(err));
+        }
+    }, [getCurrentPhoto, headers, thumbImg, photos]);
 
     function onKeyDown(e: React.KeyboardEvent): void {
         switch (e.key) {
@@ -140,9 +175,9 @@ export function PhotoView({photos}: PhotoViewProps) {
                     <>
                         <div className="photo-container">
                             <div className="photo">
-                                <Image src={"http://localhost:8080/api/photo/" + getCurrentPhoto().id + "/thumbnail"}
+                                <Image src={thumbImg}
                                        preview
-                                       zoomSrc={"http://localhost:8080/api/photo/" + getCurrentPhoto().id}
+                                       zoomSrc={largeImg}
                                        indicatorIcon="pi pi-search"
                                        className="photo"/>
                             </div>

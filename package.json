@@ -12,6 +12,7 @@
   "dependencies": {
     "@vueuse/core": "^14.1.0",
     "arrow-keys-react": "^1.0.6",
+    "image-auth": "^0.0.16",
     "jwt-decode": "^4.0.0",
     "primeicons": "^7.0.0",
     "primereact": "^10.9.7",
