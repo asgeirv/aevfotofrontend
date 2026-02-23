@@ -1,16 +1,17 @@
-import {useState} from 'react';
+import {useState} from "react";
 import {Card} from "primereact/card";
 import {Button} from "primereact/button";
 import {FloatLabel} from "primereact/floatlabel";
 import {InputText} from "primereact/inputtext";
 import * as React from "react";
+import {useNavigate} from "react-router-dom";
 
 export default function LoginPage() {
-    const [username, setUsername] = useState('');
-    const [password, setPassword] = useState('');
-    const [error, setError] = useState('');
+    const [username, setUsername] = useState("");
+    const [password, setPassword] = useState("");
+    const [error, setError] = useState("");
     const [isLoading, setIsLoading] = useState(false);
-    const [token, setToken] = useState('');
+    const navigate = useNavigate();
 
     const handleLogin: (e: React.FormEvent<HTMLFormElement>) => Promise<void> = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -22,6 +23,7 @@ export default function LoginPage() {
         }
 
         setIsLoading(true);
+        console.log(JSON.stringify({username, password}));
 
         try {
             const response: Response = await fetch("http://localhost:8080/api/login", {
@@ -35,10 +37,9 @@ export default function LoginPage() {
             const json = await response.json();
 
             if (response.ok) {
-                console.log('Login successful!', json);
-                localStorage.setItem('token', json.token);
-                setToken(json.token);
-                window.location.href = "/app";
+                console.log("Login successful!", json);
+                localStorage.setItem("token", json.token);
+                navigate("/app");
             } else {
                 setError(json.message || "Invalid username or password");
             }

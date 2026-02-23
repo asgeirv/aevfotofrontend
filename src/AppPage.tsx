@@ -7,8 +7,10 @@ import {SubfolderPicker} from "./components/SubfolderPicker.tsx";
 import {PhotoView} from "./components/PhotoView.tsx";
 import {useEffect, useState} from "react";
 import type {Photo} from "./models/Photo.ts";
+import {type AuthStuff, useAuth} from "./hooks/useAuth.tsx";
 
 export default function AppPage() {
+    const authStuff: AuthStuff = useAuth();
     const [selectedYear, setSelectedYear] = useState<number>();
     const [years, setYears] = useState<number[]>([]);
     const [selectedMonth, setSelectedMonth] = useState<number>();
@@ -56,6 +58,12 @@ export default function AppPage() {
         }
     }, [selectedYear, selectedMonth, selectedSubfolder]);
 
+
+    if (!authStuff.isAuthenticated) {
+        return (
+            <div className="app-container">Please do the login stuff</div>
+        )
+    }
 
     return (
         <div className="app-container">

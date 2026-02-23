@@ -1,5 +1,6 @@
-import {Navigate} from 'react-router-dom';
+import {Navigate} from "react-router-dom";
 import * as React from "react";
+import {isTokenValid} from '../utils/jwtValidation';
 
 // Definitely not AI generated
 interface ProtectedRouteProps {
@@ -7,17 +8,11 @@ interface ProtectedRouteProps {
 }
 
 export default function ProtectedRoute({children}: ProtectedRouteProps) {
-    const isAuthenticated: () => boolean = (): boolean => {
-        // Check if user has a valid token
-        const token: string | null = localStorage.getItem('token');
-        return !!token;
+    const token: string | null = localStorage.getItem("token");
 
-        // Optional: You can add token validation here
-        // For example, check if token is expired
-    };
-
-    if (!isAuthenticated()) {
-        // Redirect to login if not authenticated
+    if (!isTokenValid(token)) {
+        console.log("Invalid token!")
+        localStorage.removeItem("token");
         return <Navigate to="/login" replace/>;
     }
 
