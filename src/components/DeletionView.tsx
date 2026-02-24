@@ -1,33 +1,33 @@
 import {Button} from "primereact/button";
+import * as React from "react";
 import {useEffect, useRef, useState} from "react";
 import {OverlayPanel} from "primereact/overlaypanel";
 import type {Photo} from "../models/Photo.ts";
 import {PhotoTable} from "./PhotoTable.tsx";
 import {confirmDialog, ConfirmDialog} from "primereact/confirmdialog";
+import {apiClient} from "../utils/apiClient.tsx";
 
-export function DeletionView() {
+export function DeletionView(): React.ReactElement {
     const deleted = useRef<OverlayPanel>(null);
     const [photos, setPhotos] = useState<Photo[]>([]);
 
-    useEffect(() => {
-        fetch(`http://localhost:8080/api/photos/deleted`)
-            .then((res) => res.json())
-            .then(data => setPhotos(data))
-            .catch((err) => console.log(err));
+    useEffect((): void => {
+        apiClient("photos/deleted")
+            .then((res: Response): Promise<Photo[]> => res.json())
+            .then((data: Photo[]) => setPhotos(data))
+            .catch((err): void => console.log(err));
     }, []);
 
-    const accept = () => {
-        fetch(`http://localhost:8080/api/photos/deleted/nuke`,
-            {
-                method: "DELETE",
-            })
+    const accept: () => void = (): void => {
+        apiClient("photos/deleted/nuke")
             .then(() => setPhotos([]))
-            .catch((err) => console.log(err));
+            .catch((err): void => console.log(err));
     };
 
-    const reject = () => {};
+    const reject: () => void = (): void => {
+    };
 
-    const confirmNuke = () => {
+    const confirmNuke: () => void = (): void => {
         confirmDialog({
             message: "Are you sure you want to permanently delete all photos marked for deletion?",
             header: "Confirm deletion",

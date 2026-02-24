@@ -23,7 +23,6 @@ export default function LoginPage() {
         }
 
         setIsLoading(true);
-        console.log(JSON.stringify({username, password}));
 
         try {
             const response: Response = await fetch("http://localhost:8080/api/login", {
@@ -37,7 +36,6 @@ export default function LoginPage() {
             const json = await response.json();
 
             if (response.ok) {
-                console.log("Login successful!", json);
                 localStorage.setItem("token", json.token);
                 navigate("/app");
             } else {

@@ -1,29 +1,31 @@
 import {OverlayPanel} from "primereact/overlaypanel";
 import {Button} from "primereact/button";
+import * as React from "react";
 import {useEffect, useRef, useState} from "react";
 import type {Photo} from "../models/Photo.ts";
-import {Dropdown} from "primereact/dropdown";
+import {Dropdown, type DropdownChangeEvent} from "primereact/dropdown";
 import {PhotoTable} from "./PhotoTable.tsx";
+import {apiClient} from "../utils/apiClient.tsx";
 
-export function PortfolioView() {
+export function PortfolioView(): React.ReactElement {
     const portfolio = useRef<OverlayPanel>(null);
     const [photos, setPhotos] = useState<Photo[]>([]);
     const [ratingThreshold, setRatingThreshold] = useState<number>(5);
     const availableRatings: number[] = [5, 4, 3, 2, 1];
 
     useEffect(() => {
-        fetch(`http://localhost:8080/api/portfolio/${ratingThreshold}`)
+        apiClient(`portfolio/${ratingThreshold}`)
             .then((res) => res.json())
             .then(data => setPhotos(data))
             .catch((err) => console.log(err));
     }, [ratingThreshold]);
 
-    function downloadPortfolio() {
-        fetch(`http://localhost:8080/api/portfolio/dl/${ratingThreshold}`)
-            .then(res => res.blob())
-            .then((blob) => {
-                const fileUrl = URL.createObjectURL(blob);
-                const link = document.createElement("a");
+    function downloadPortfolio(): void {
+        apiClient(`portfolio/dl/${ratingThreshold}`)
+            .then((res: Response): Promise<Blob> => res.blob())
+            .then((blob: Blob): void => {
+                const fileUrl: string = URL.createObjectURL(blob);
+                const link: HTMLAnchorElement = document.createElement("a");
                 link.href = fileUrl;
                 link.download = "portfolio.zip";
                 link.click();
@@ -47,7 +49,7 @@ export function PortfolioView() {
                         Rating threshold:
                         <Dropdown value={ratingThreshold}
                                   style={{marginLeft: "0.5rem"}}
-                                  onChange={(e) => {
+                                  onChange={(e: DropdownChangeEvent) => {
                                       setRatingThreshold(e.target.value);
                                   }}
                                   options={availableRatings}/>

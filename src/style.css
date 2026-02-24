@@ -122,6 +122,11 @@
     }
 }
 
+.portfolio-thumb {
+    max-height: 8rem;
+    padding: 0.15rem;
+}
+
 .photo-container {
     display: flex;
     justify-content: center;

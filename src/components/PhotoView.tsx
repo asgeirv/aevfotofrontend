@@ -1,32 +1,32 @@
 import * as React from "react";
-import {useCallback, useEffect, useState} from "react";
+import {type ReactElement, useCallback, useEffect, useState} from "react";
 import {useGlobalKeydown} from "../KeyBoardEvents.tsx";
 import {Card} from "primereact/card";
 import {Image} from "primereact/image";
 import {Button} from "primereact/button";
-import {Rating} from "primereact/rating";
+import {Rating, type RatingChangeEvent} from "primereact/rating";
 import type {Nullable} from "primereact/ts-helpers";
 import type {Photo} from "../models/Photo.ts";
+import {apiClient, fetchPhotoData} from "../utils/apiClient.tsx";
+import type {PhotoData} from "../models/PhotoData.ts";
 
 interface PhotoViewProps {
     photos: Photo[] | undefined;
 }
 
-export function PhotoView({photos}: PhotoViewProps) {
+export function PhotoView({photos}: PhotoViewProps): ReactElement {
     photos?.sort((a: Photo, b: Photo) => (a.filename < b.filename) ? -1 : (a.filename > b.filename) ? 1 : 0);
     const [currentId, setCurrentId] = useState<number>(0);
     const [count, setCount] = useState<number>(0);
-    const [thumbImg, setThumbImg] = useState<string>();
-    const [largeImg, setLargeImg] = useState<string>();
-    const headers = new Headers();
-    headers.set('Authorization', `Bearer ${localStorage.getItem("token")}`);
+    const [thumbImg, setThumbImg] = useState<string | undefined>();
+    const [largeImg, setLargeImg] = useState<string | undefined>();
 
     if (photos && currentId > photos.length) {
         setCurrentId(0);
     }
     const cardTitle: string = photos && photos.length > 0 ? `Photo ${currentId + 1} / ${photos.length}` : "No photos found!";
 
-    function previousPhoto() {
+    function previousPhoto(): void {
         if (photos) {
             if (currentId === 0) {
                 setCurrentId(photos?.length - 1);
@@ -36,7 +36,7 @@ export function PhotoView({photos}: PhotoViewProps) {
         }
     }
 
-    function nextPhoto() {
+    function nextPhoto(): void {
         if (photos) {
             if (currentId === photos?.length - 1) {
                 setCurrentId(0);
@@ -54,7 +54,7 @@ export function PhotoView({photos}: PhotoViewProps) {
         }
     }, [currentId, photos]);
 
-    function updateRating(photo: Photo, rating: Nullable<number>) {
+    function updateRating(photo: Photo, rating: Nullable<number>): void {
         if (rating === undefined) {
             console.error("Undefined rating!");
             return;
@@ -67,13 +67,13 @@ export function PhotoView({photos}: PhotoViewProps) {
         updatePhoto(photo);
     }
 
-    function toggleDeletion(photo: Photo) {
+    function toggleDeletion(photo: Photo): void {
         photo.flaggedForDeletion = !photo.flaggedForDeletion;
         updatePhoto(photo);
     }
 
-    function updatePhoto(photo: Photo) {
-        fetch(`http://localhost:8080/api/photo`,
+    function updatePhoto(photo: Photo): void {
+        apiClient("photo",
             {
                 method: "POST",
                 body: JSON.stringify(photo),
@@ -87,36 +87,15 @@ export function PhotoView({photos}: PhotoViewProps) {
         setCount(count + 1);
     }
 
-    function arrayBufferToBase64(buffer: ArrayBuffer): string {
-        console.log(buffer)
-        return btoa(String.fromCharCode(...new Uint8Array(buffer)));
-    }
-
-    useEffect(() => {
+    useEffect((): void => {
         if (photos && photos.length > 0) {
-            fetch(`http://localhost:8080/api/photo/${getCurrentPhoto().id}/thumbnail`,
-                {headers})
-                .then((res: Response): Promise<ArrayBuffer> => res.arrayBuffer())
-                .then((data: ArrayBuffer): void => {
-                    const base64: string = arrayBufferToBase64(data);
-                    setThumbImg(`data:image/jpg;base64,${base64}`);
-                })
-                .catch(err => console.log(err));
-        }
-    }, [photos, headers, thumbImg, getCurrentPhoto]);
+            fetchPhotoData(getCurrentPhoto().id, true)
+                .then((img: PhotoData): void => setThumbImg(img.data));
 
-    useEffect(() => {
-        if (photos && photos.length > 0) {
-            fetch(`http://localhost:8080/api/photo/${getCurrentPhoto().id}`,
-                {headers})
-                .then((res: Response): Promise<ArrayBuffer> => res.arrayBuffer())
-                .then((data: ArrayBuffer): void => {
-                    const base64: string = arrayBufferToBase64(data);
-                    setLargeImg(`data:image/jpg;base64,${base64}`);
-                })
-                .catch(err => console.log(err));
+            fetchPhotoData(getCurrentPhoto().id)
+                .then((img: PhotoData): void => setLargeImg(img.data))
         }
-    }, [getCurrentPhoto, headers, thumbImg, photos]);
+    }, [photos, thumbImg, largeImg, getCurrentPhoto]);
 
     function onKeyDown(e: React.KeyboardEvent): void {
         switch (e.key) {
@@ -190,7 +169,7 @@ export function PhotoView({photos}: PhotoViewProps) {
                                     tooltipOptions={{position: "right"}}/>
 
                             <Rating value={photos[currentId].rating}
-                                    onChange={(e) => updateRating(getCurrentPhoto(), e.value)}/>
+                                    onChange={(e: RatingChangeEvent) => updateRating(getCurrentPhoto(), e.value)}/>
 
                             <Button icon="pi pi-arrow-right"
                                     onClick={nextPhoto}
@@ -201,7 +180,7 @@ export function PhotoView({photos}: PhotoViewProps) {
                         <div id="photo-del-container">
                             <Button icon={photos[currentId].flaggedForDeletion ? "pi pi-undo" : "pi pi-trash"}
                                     severity="danger"
-                                    onClick={() => toggleDeletion(getCurrentPhoto())}
+                                    onClick={(): void => toggleDeletion(getCurrentPhoto())}
                                     tooltip="Mark for deletion (Del)"
                                     tooltipOptions={{position: "bottom"}}/>
                         </div>

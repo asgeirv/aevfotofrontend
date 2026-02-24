@@ -9,6 +9,7 @@ import {useEffect, useState} from "react";
 import type {Photo} from "./models/Photo.ts";
 import {type AuthStuff, useAuth} from "./hooks/useAuth.tsx";
 import {Button} from "primereact/button";
+import {apiClient} from "./utils/apiClient.tsx";
 
 export default function AppPage() {
     const authStuff: AuthStuff = useAuth();
@@ -21,7 +22,7 @@ export default function AppPage() {
     const [photos, setPhotos] = useState<Photo[]>([]);
 
     useEffect(() => {
-        fetch("http://localhost:8080/api/years")
+        apiClient("years")
             .then(res => res.json())
             .then(data => setYears(data))
             .catch(err => console.error(err));
@@ -29,7 +30,7 @@ export default function AppPage() {
 
     useEffect(() => {
         if (selectedYear) {
-            fetch(`http://localhost:8080/api/${selectedYear}`)
+            apiClient(`${selectedYear}`)
                 .then(res => res.json())
                 .then(data => setMonths(data))
                 .catch(err => console.error(err));
@@ -38,7 +39,7 @@ export default function AppPage() {
 
     useEffect(() => {
         if (selectedYear && selectedMonth) {
-            fetch(`http://localhost:8080/api/${selectedYear}/${selectedMonth}/subfolders`)
+            apiClient(`${selectedYear}/${selectedMonth}/subfolders`)
                 .then(res => res.json())
                 .then(data => setSubfolders(data))
                 .catch(err => console.error(err));
@@ -47,12 +48,12 @@ export default function AppPage() {
 
     useEffect(() => {
         if (selectedYear && selectedMonth && selectedSubfolder) {
-            fetch(`http://localhost:8080/api/photos/${selectedYear}/${selectedMonth}/${selectedSubfolder}`)
+            apiClient(`photos/${selectedYear}/${selectedMonth}/${selectedSubfolder}`)
                 .then(res => res.json())
                 .then(data => setPhotos(data))
                 .catch(err => console.error(err));
         } else if (selectedYear && selectedMonth) {
-            fetch(`http://localhost:8080/api/photos/${selectedYear}/${selectedMonth}`)
+            apiClient(`photos/${selectedYear}/${selectedMonth}`)
                 .then(res => res.json())
                 .then(data => setPhotos(data))
                 .catch(err => console.error(err));
