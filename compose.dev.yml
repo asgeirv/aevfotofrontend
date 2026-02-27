@@ -1,4 +1,8 @@
 services:
+  db:
+    ports:
+      - "3306:3306"
+
   backend:
     container_name: aevfoto_backend_debug
     ports:
