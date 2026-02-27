@@ -56,7 +56,7 @@ export function DeletionView(): React.ReactElement {
                         severity="danger"
                         size="large"
                         onClick={confirmNuke}
-                        style={{width: "100%"}}/>
+                        style={{width: "100%", marginTop: "1rem"}}/>
             </OverlayPanel>
         </div>
     )
