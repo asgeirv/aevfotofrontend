@@ -25,7 +25,7 @@ export default function LoginPage() {
         setIsLoading(true);
 
         try {
-            const response: Response = await fetch("http://localhost:8080/api/login", {
+            const response: Response = await fetch("http://localhost:8080/api/user/login", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
