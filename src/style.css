@@ -171,6 +171,12 @@
     justify-content: center;
 }
 
+.photo-card-header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
 #photo-nav-container {
     margin-top: 1rem;
     display: flex;

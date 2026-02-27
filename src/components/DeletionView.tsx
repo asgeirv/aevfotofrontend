@@ -6,8 +6,10 @@ import type {Photo} from "../models/Photo.ts";
 import {PhotoTable} from "./PhotoTable.tsx";
 import {confirmDialog, ConfirmDialog} from "primereact/confirmdialog";
 import {apiClient} from "../utils/apiClient.tsx";
+import {useAuth} from "../hooks/useAuth.tsx";
 
 export function DeletionView(): React.ReactElement {
+    const authStuff = useAuth();
     const deleted = useRef<OverlayPanel>(null);
     const [photos, setPhotos] = useState<Photo[]>([]);
 
@@ -19,7 +21,10 @@ export function DeletionView(): React.ReactElement {
     }, []);
 
     const accept: () => void = (): void => {
-        apiClient("photos/deleted/nuke")
+        apiClient("photos/deleted/nuke",
+            {
+                method: "DELETE"
+            })
             .then(() => setPhotos([]))
             .catch((err): void => console.log(err));
     };
@@ -50,13 +55,16 @@ export function DeletionView(): React.ReactElement {
                 <PhotoTable photos={photos}
                             emptyMessage={"No photos flagged for deletion."}/>
 
-                <ConfirmDialog/>
-                <Button type="button"
-                        icon="pi pi-trash"
-                        severity="danger"
-                        size="large"
-                        onClick={confirmNuke}
-                        style={{width: "100%", marginTop: "1rem"}}/>
+                {authStuff.canWrite() && photos && photos.length > 0 ? (
+                    <>
+                        <ConfirmDialog/><Button type="button"
+                                                icon="pi pi-trash"
+                                                severity="danger"
+                                                size="large"
+                                                onClick={confirmNuke}
+                                                style={{width: "100%", marginTop: "1rem"}}/>
+                    </>
+                ) : null}
             </OverlayPanel>
         </div>
     )

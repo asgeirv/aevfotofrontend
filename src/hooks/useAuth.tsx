@@ -6,6 +6,8 @@ export type AuthStuff = {
     isLoading: boolean;
     logout: () => void;
     getUsername: () => (string | null);
+    getRole: () => (string | null);
+    canWrite: () => boolean;
 }
 
 export const useAuth: () => AuthStuff = (): AuthStuff => {
@@ -33,14 +35,36 @@ export const useAuth: () => AuthStuff = (): AuthStuff => {
         if (!token) {
             return null;
         }
+
         const payload: JwtPayload | null = getTokenPayload(token);
         return payload?.sub || null;
     };
+
+    const getRole: () => string | null = (): string | null => {
+        const token: string | null = localStorage.getItem("token");
+        if (!token) {
+            return null;
+        }
+
+        const payload: JwtPayload | null = getTokenPayload(token);
+        return payload?.role || null;
+    }
+
+    const canWrite: () => boolean = (): boolean => {
+        const token: string | null = localStorage.getItem("token");
+        if (!token) {
+            return false;
+        }
+
+        return getRole() === "ADMIN" || getRole() === "READ_WRITE";
+    }
 
     return {
         isAuthenticated,
         isLoading,
         logout,
         getUsername: getUsername,
+        getRole: getRole,
+        canWrite: canWrite
     };
 };

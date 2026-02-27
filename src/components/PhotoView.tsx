@@ -9,6 +9,7 @@ import type {Nullable} from "primereact/ts-helpers";
 import type {Photo} from "../models/Photo.ts";
 import {apiClient, fetchPhotoData} from "../utils/apiClient.tsx";
 import type {PhotoData} from "../models/PhotoData.ts";
+import {useAuth} from "../hooks/useAuth.tsx";
 
 interface PhotoViewProps {
     photos: Photo[] | undefined;
@@ -16,6 +17,7 @@ interface PhotoViewProps {
 
 export function PhotoView({photos}: PhotoViewProps): ReactElement {
     photos?.sort((a: Photo, b: Photo) => (a.filename < b.filename) ? -1 : (a.filename > b.filename) ? 1 : 0);
+    const authStuff = useAuth();
     const [currentId, setCurrentId] = useState<number>(0);
     const [count, setCount] = useState<number>(0);
     const [thumbImg, setThumbImg] = useState<string | undefined>();
@@ -24,7 +26,6 @@ export function PhotoView({photos}: PhotoViewProps): ReactElement {
     if (photos && currentId > photos.length) {
         setCurrentId(0);
     }
-    const cardTitle: string = photos && photos.length > 0 ? `Photo ${currentId + 1} / ${photos.length}` : "No photos found!";
 
     function previousPhoto(): void {
         if (photos) {
@@ -149,7 +150,17 @@ export function PhotoView({photos}: PhotoViewProps): ReactElement {
 
     return (
         <div id="image-container">
-            <Card title={cardTitle}>
+            <Card title={
+                <div className="photo-card-header">
+                    <div>
+                        {photos && photos.length > 0 ? `Photo ${currentId + 1} / ${photos.length}` : ""}
+                    </div>
+
+                    <div>
+                        Logged in as: {authStuff.getUsername()}
+                    </div>
+                </div>
+            }>
                 {photos && photos.length > 0 ? (
                     <>
                         <div className="photo-container">
@@ -169,7 +180,8 @@ export function PhotoView({photos}: PhotoViewProps): ReactElement {
                                     tooltipOptions={{position: "right"}}/>
 
                             <Rating value={photos[currentId].rating}
-                                    onChange={(e: RatingChangeEvent) => updateRating(getCurrentPhoto(), e.value)}/>
+                                    onChange={(e: RatingChangeEvent) => updateRating(getCurrentPhoto(), e.value)}
+                                    readOnly={!authStuff.canWrite()}/>
 
                             <Button icon="pi pi-arrow-right"
                                     onClick={nextPhoto}
@@ -177,18 +189,21 @@ export function PhotoView({photos}: PhotoViewProps): ReactElement {
                                     tooltipOptions={{position: "left"}}/>
                         </div>
 
-                        <div id="photo-del-container">
-                            <Button icon={photos[currentId].flaggedForDeletion ? "pi pi-undo" : "pi pi-trash"}
+                        {authStuff.canWrite() ? (
+                            <div id="photo-del-container">
+                                <Button
+                                    icon={photos[currentId].flaggedForDeletion ? "pi pi-undo" : "pi pi-trash"}
                                     severity="danger"
                                     onClick={(): void => toggleDeletion(getCurrentPhoto())}
                                     tooltip="Mark for deletion (Del)"
                                     tooltipOptions={{position: "bottom"}}/>
-                        </div>
+                            </div>
+                        ) : null}
                     </>
                 ) : (
-                    <p></p>
+                    <p>No photos found!</p>
                 )}
-            </Card>
-        </div>
-    )
+        </Card>
+</div>
+)
 }

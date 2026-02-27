@@ -4,6 +4,7 @@ export interface JwtPayload {
     exp: number;
     iat?: number;
     sub?: string;
+    role?: string;
 }
 
 const isTokenExpired: (token: string) => boolean = (token: string): boolean => {
