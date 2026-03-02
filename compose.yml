@@ -33,6 +33,17 @@ services:
     image: aevfoto_frontend
     depends_on:
       - backend
+    volumes:
+      - ${NGINX_PATH}/conf.d/:/etc/nginx/conf.d/:ro
+      - ${CERTBOT_PATH}/www/:/var/www/certbot/:ro
+
+  certbot:
+    image: certbot/certbot:latest
+    volumes:
+      - ${CERTBOT_PATH}/www/:/var/www/certbot/:rw
+      - ${CERTBOT_PATH}/conf/:/etc/letsencrypt/:rw
+    depends_on:
+      - frontend
 
 secrets:
   dbpw:

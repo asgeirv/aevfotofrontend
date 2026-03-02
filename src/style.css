@@ -156,15 +156,6 @@
     flex-wrap: wrap;
 }
 
-.portfolio-img {
-    padding: 0.5rem;
-}
-
-.portfolio-thumbnail {
-    cursor: pointer;
-    max-height: 100px;
-}
-
 .photo {
     display: flex;
     align-content: center;

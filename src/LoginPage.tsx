@@ -1,9 +1,9 @@
+import * as React from "react";
 import {useState} from "react";
 import {Card} from "primereact/card";
 import {Button} from "primereact/button";
 import {FloatLabel} from "primereact/floatlabel";
 import {InputText} from "primereact/inputtext";
-import * as React from "react";
 import {useNavigate} from "react-router-dom";
 
 export default function LoginPage() {
