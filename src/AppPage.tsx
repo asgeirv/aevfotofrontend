@@ -5,13 +5,13 @@ import {YearPicker} from "./components/YearPicker.tsx";
 import {MonthPicker} from "./components/MonthPicker.tsx";
 import {SubfolderPicker} from "./components/SubfolderPicker.tsx";
 import {PhotoView} from "./components/PhotoView.tsx";
-import {useEffect, useState} from "react";
+import {type ReactElement, useEffect, useState} from "react";
 import type {Photo} from "./models/Photo.ts";
 import {type AuthStuff, useAuth} from "./hooks/useAuth.tsx";
 import {Button} from "primereact/button";
 import {apiClient} from "./utils/apiClient.tsx";
 
-export default function AppPage() {
+export default function AppPage(): ReactElement {
     const authStuff: AuthStuff = useAuth();
     const [selectedYear, setSelectedYear] = useState<number>();
     const [years, setYears] = useState<number[]>([]);
@@ -20,45 +20,53 @@ export default function AppPage() {
     const [selectedSubfolder, setSelectedSubfolder] = useState<string | undefined>(undefined);
     const [subfolders, setSubfolders] = useState<string[]>([]);
     const [photos, setPhotos] = useState<Photo[]>([]);
+    const [deletedPhotos, setDeletedPhotos] = useState<Photo[]>([]);
 
-    useEffect(() => {
+    useEffect((): void => {
         apiClient("years")
-            .then(res => res.json())
-            .then(data => setYears(data))
+            .then((res: Response): Promise<number[]> => res.json())
+            .then((data: number[]): void => setYears(data))
             .catch(err => console.error(err));
     }, []);
 
-    useEffect(() => {
+    useEffect((): void => {
         if (selectedYear) {
             apiClient(`${selectedYear}`)
-                .then(res => res.json())
-                .then(data => setMonths(data))
+                .then((res: Response): Promise<number[]> => res.json())
+                .then((data: number[]): void => setMonths(data))
                 .catch(err => console.error(err));
         }
     }, [selectedYear]);
 
-    useEffect(() => {
+    useEffect((): void => {
         if (selectedYear && selectedMonth) {
             apiClient(`${selectedYear}/${selectedMonth}/subfolders`)
-                .then(res => res.json())
-                .then(data => setSubfolders(data))
+                .then((res: Response): Promise<string[]> => res.json())
+                .then((data: string[]): void => setSubfolders(data))
                 .catch(err => console.error(err));
         }
     }, [selectedYear, selectedMonth]);
 
-    useEffect(() => {
+    useEffect((): void => {
         if (selectedYear && selectedMonth && selectedSubfolder) {
             apiClient(`photos/${selectedYear}/${selectedMonth}/${selectedSubfolder}`)
-                .then(res => res.json())
-                .then(data => setPhotos(data))
+                .then((res: Response): Promise<Photo[]> => res.json())
+                .then((data: Photo[]): void => setPhotos(data))
                 .catch(err => console.error(err));
         } else if (selectedYear && selectedMonth) {
             apiClient(`photos/${selectedYear}/${selectedMonth}`)
-                .then(res => res.json())
-                .then(data => setPhotos(data))
+                .then((res: Response): Promise<Photo[]> => res.json())
+                .then((data: Photo[]): void => setPhotos(data))
                 .catch(err => console.error(err));
         }
     }, [selectedYear, selectedMonth, selectedSubfolder]);
+
+    useEffect((): void => {
+        apiClient("photos/deleted")
+            .then((res: Response): Promise<Photo[]> => res.json())
+            .then((data: Photo[]): void => setDeletedPhotos(data))
+            .catch((err): void => console.log(err));
+    }, [deletedPhotos]);
 
 
     if (!authStuff.isAuthenticated) {
@@ -75,12 +83,13 @@ export default function AppPage() {
                     <div className="photo-handling">
                         <div className="nav-buttons">
                             <PortfolioView/>
-                            <DeletionView/>
+                            <DeletionView photos={deletedPhotos}
+                                          setPhotos={setDeletedPhotos}/>
                         </div>
 
                         <div className="logout-button">
                             <Button icon="pi pi-sign-out"
-                            onClick={() => authStuff.logout()}/>
+                                    onClick={(): void => authStuff.logout()}/>
                         </div>
                     </div>
                 </Card>

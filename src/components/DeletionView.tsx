@@ -1,31 +1,28 @@
 import {Button} from "primereact/button";
 import * as React from "react";
-import {useEffect, useRef, useState} from "react";
+import {useRef} from "react";
 import {OverlayPanel} from "primereact/overlaypanel";
 import type {Photo} from "../models/Photo.ts";
 import {PhotoTable} from "./PhotoTable.tsx";
 import {confirmDialog, ConfirmDialog} from "primereact/confirmdialog";
 import {apiClient} from "../utils/apiClient.tsx";
-import {useAuth} from "../hooks/useAuth.tsx";
+import {type AuthStuff, useAuth} from "../hooks/useAuth.tsx";
 
-export function DeletionView(): React.ReactElement {
-    const authStuff = useAuth();
-    const deleted = useRef<OverlayPanel>(null);
-    const [photos, setPhotos] = useState<Photo[]>([]);
+interface DeletionViewProps {
+    photos: Photo[];
+    setPhotos: (photos: Photo[]) => void;
+}
 
-    useEffect((): void => {
-        apiClient("photos/deleted")
-            .then((res: Response): Promise<Photo[]> => res.json())
-            .then((data: Photo[]) => setPhotos(data))
-            .catch((err): void => console.log(err));
-    }, []);
+export function DeletionView({photos, setPhotos}: DeletionViewProps): React.ReactElement {
+    const authStuff: AuthStuff = useAuth();
+    const deleted: React.RefObject<OverlayPanel | null> = useRef<OverlayPanel>(null);
 
     const accept: () => void = (): void => {
         apiClient("photos/deleted/nuke",
             {
                 method: "DELETE"
             })
-            .then(() => setPhotos([]))
+            .then((): void => setPhotos([]))
             .catch((err): void => console.log(err));
     };
 
@@ -52,9 +49,6 @@ export function DeletionView(): React.ReactElement {
                     onClick={(e) => deleted.current?.toggle(e)}/>
 
             <OverlayPanel ref={deleted}>
-                <PhotoTable photos={photos}
-                            emptyMessage={"No photos flagged for deletion."}/>
-
                 {authStuff.canWrite() && photos && photos.length > 0 ? (
                     <>
                         <ConfirmDialog/><Button type="button"
@@ -62,9 +56,12 @@ export function DeletionView(): React.ReactElement {
                                                 severity="danger"
                                                 size="large"
                                                 onClick={confirmNuke}
-                                                style={{width: "100%", marginTop: "1rem"}}/>
+                                                style={{width: "100%", marginBottom: "1rem"}}/>
                     </>
                 ) : null}
+
+                <PhotoTable photos={photos}
+                            emptyMessage={"No photos flagged for deletion."}/>
             </OverlayPanel>
         </div>
     )

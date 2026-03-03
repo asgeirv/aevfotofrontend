@@ -180,7 +180,7 @@ export function PhotoView({photos}: PhotoViewProps): ReactElement {
                                     tooltipOptions={{position: "right"}}/>
 
                             <Rating value={photos[currentId].rating}
-                                    onChange={(e: RatingChangeEvent) => updateRating(getCurrentPhoto(), e.value)}
+                                    onChange={(e: RatingChangeEvent): void => updateRating(getCurrentPhoto(), e.value)}
                                     readOnly={!authStuff.canWrite()}/>
 
                             <Button icon="pi pi-arrow-right"

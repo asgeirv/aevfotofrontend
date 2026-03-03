@@ -8,16 +8,16 @@ import {PhotoTable} from "./PhotoTable.tsx";
 import {apiClient} from "../utils/apiClient.tsx";
 
 export function PortfolioView(): React.ReactElement {
-    const portfolio = useRef<OverlayPanel>(null);
+    const portfolio: React.RefObject<OverlayPanel | null> = useRef<OverlayPanel>(null);
     const [photos, setPhotos] = useState<Photo[]>([]);
     const [ratingThreshold, setRatingThreshold] = useState<number>(5);
     const availableRatings: number[] = [5, 4, 3, 2, 1];
 
-    useEffect(() => {
+    useEffect((): void => {
         apiClient(`portfolio/${ratingThreshold}`)
-            .then((res) => res.json())
-            .then(data => setPhotos(data))
-            .catch((err) => console.log(err));
+            .then((res: Response): Promise<Photo[]> => res.json())
+            .then((data: Photo[]): void => setPhotos(data))
+            .catch((err): void => console.log(err));
     }, [ratingThreshold]);
 
     function downloadPortfolio(): void {
