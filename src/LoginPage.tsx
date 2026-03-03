@@ -36,7 +36,8 @@ export default function LoginPage() {
             const json = await response.json();
 
             if (response.ok) {
-                localStorage.setItem("token", json.token);
+                localStorage.setItem("accessToken", json.accessToken);
+                localStorage.setItem("refreshToken", json.refreshToken);
                 navigate("/app");
             } else {
                 setError(json.message || "Invalid username or password");

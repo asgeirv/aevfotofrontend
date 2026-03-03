@@ -32,7 +32,9 @@ export const isTokenValid: (token: (string | null)) => boolean = (token: string 
     }
 };
 
-export const getTokenPayload: (token: string) => (JwtPayload | null) = (token: string): JwtPayload | null => {
+export const getTokenPayload: (token: string | null) => (JwtPayload | null) = (token: string | null): JwtPayload | null => {
+    if (!token) return null;
+
     try {
         return jwtDecode<JwtPayload>(token);
     } catch (error) {

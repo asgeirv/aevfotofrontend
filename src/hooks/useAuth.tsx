@@ -1,5 +1,6 @@
-import {useState, useEffect} from "react";
-import {isTokenValid, getTokenPayload, type JwtPayload} from "../utils/jwtValidation";
+import {useEffect, useState} from "react";
+import {getTokenPayload, isTokenValid, type JwtPayload} from "../utils/jwtValidation";
+import {signOut} from "../utils/apiClient.tsx";
 
 export type AuthStuff = {
     isAuthenticated: boolean;
@@ -15,8 +16,8 @@ export const useAuth: () => AuthStuff = (): AuthStuff => {
     const [isLoading, setIsLoading] = useState<boolean>(true);
 
     useEffect((): void => {
-        const checkAuth: () => void = () => {
-            const token: string | null = localStorage.getItem("token");
+        const checkAuth: () => void = (): void => {
+            const token: string | null = localStorage.getItem("accessToken");
             setIsAuthenticated(isTokenValid(token));
             setIsLoading(false);
         };
@@ -25,14 +26,16 @@ export const useAuth: () => AuthStuff = (): AuthStuff => {
     }, []);
 
     const logout: () => void = (): void => {
-        localStorage.removeItem("token");
-        setIsAuthenticated(false);
-        window.location.href = "/login";
+        signOut()
+            .then((): void => {
+                setIsAuthenticated(false);
+                window.location.href = "/login";
+            });
     };
 
     const getUsername: () => (string | null) = (): string | null => {
-        const token: string | null = localStorage.getItem("token");
-        if (!token) {
+        const token: string | null = localStorage.getItem("accessToken");
+        if (!isTokenValid(token)) {
             return null;
         }
 
@@ -41,8 +44,8 @@ export const useAuth: () => AuthStuff = (): AuthStuff => {
     };
 
     const getRole: () => string | null = (): string | null => {
-        const token: string | null = localStorage.getItem("token");
-        if (!token) {
+        const token: string | null = localStorage.getItem("accessToken");
+        if (!isTokenValid(token)) {
             return null;
         }
 
@@ -51,8 +54,8 @@ export const useAuth: () => AuthStuff = (): AuthStuff => {
     }
 
     const canWrite: () => boolean = (): boolean => {
-        const token: string | null = localStorage.getItem("token");
-        if (!token) {
+        const token: string | null = localStorage.getItem("accessToken");
+        if (!isTokenValid(token)) {
             return false;
         }
 
