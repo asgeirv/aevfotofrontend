@@ -9,7 +9,7 @@ import type {Nullable} from "primereact/ts-helpers";
 import type {Photo} from "../models/Photo.ts";
 import {apiClient, fetchPhotoData} from "../utils/apiClient.tsx";
 import type {PhotoData} from "../models/PhotoData.ts";
-import {useAuth} from "../hooks/useAuth.tsx";
+import {type AuthStuff, useAuth} from "../hooks/useAuth.tsx";
 
 interface PhotoViewProps {
     photos: Photo[] | undefined;
@@ -17,7 +17,7 @@ interface PhotoViewProps {
 
 export function PhotoView({photos}: PhotoViewProps): ReactElement {
     photos?.sort((a: Photo, b: Photo) => (a.filename < b.filename) ? -1 : (a.filename > b.filename) ? 1 : 0);
-    const authStuff = useAuth();
+    const authStuff: AuthStuff = useAuth();
     const [currentId, setCurrentId] = useState<number>(0);
     const [count, setCount] = useState<number>(0);
     const [thumbImg, setThumbImg] = useState<string | undefined>();
@@ -203,7 +203,7 @@ export function PhotoView({photos}: PhotoViewProps): ReactElement {
                 ) : (
                     <p>No photos found!</p>
                 )}
-        </Card>
-</div>
-)
+            </Card>
+        </div>
+    )
 }

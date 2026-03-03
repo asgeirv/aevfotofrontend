@@ -1,6 +1,6 @@
 import type {Photo} from "../models/Photo.ts";
 import type {ReactElement} from "react";
-import {PortfolioPhoto} from "./Photo.tsx";
+import {PortfolioPhoto} from "./PortfolioPhoto.tsx";
 
 interface PhotoTableProps {
     photos: Photo[] | undefined;
