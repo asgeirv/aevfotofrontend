@@ -1,5 +1,6 @@
 import {FloatLabel} from "primereact/floatlabel";
-import {Dropdown} from "primereact/dropdown";
+import {Dropdown, type DropdownChangeEvent} from "primereact/dropdown";
+import type {ReactElement} from "react";
 
 interface MonthPickerProps {
     months: number[] | undefined;
@@ -7,14 +8,14 @@ interface MonthPickerProps {
     setMonth: (month: number) => void;
 }
 
-export function MonthPicker({months, selectedMonth, setMonth}: MonthPickerProps) {
+export function MonthPicker({months, selectedMonth, setMonth}: MonthPickerProps): ReactElement {
     return (
         <div className="datepicker-container">
             <FloatLabel>
                 <Dropdown inputId="month-picker"
                           variant="filled"
                           disabled={!months || months.length == 0}
-                          onChange={e => setMonth(e.target.value)}
+                          onChange={(e: DropdownChangeEvent): void => setMonth(e.target.value)}
                           value={selectedMonth}
                           options={months}
                           optionLabel="num"

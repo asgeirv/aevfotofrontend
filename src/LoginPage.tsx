@@ -1,19 +1,19 @@
 import * as React from "react";
-import {useState} from "react";
+import {type ChangeEvent, type ReactElement, useState} from "react";
 import {Card} from "primereact/card";
 import {Button} from "primereact/button";
 import {FloatLabel} from "primereact/floatlabel";
 import {InputText} from "primereact/inputtext";
 import {useNavigate} from "react-router-dom";
 
-export default function LoginPage() {
+export default function LoginPage(): ReactElement {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
     const [isLoading, setIsLoading] = useState(false);
     const navigate = useNavigate();
 
-    const handleLogin: (e: React.FormEvent<HTMLFormElement>) => Promise<void> = async (e: React.FormEvent<HTMLFormElement>) => {
+    const handleLogin: (e: React.FormEvent<HTMLFormElement>) => Promise<void> = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
         e.preventDefault();
         setError("");
 
@@ -50,12 +50,14 @@ export default function LoginPage() {
         }
     }
 
-    function footer() {
-        return (<Button label={isLoading ? "Logging in..." : "Login"}
-                        icon={isLoading ? "pi pi-spin pi-spinner" : "pi pi-sign-in"}
-                        className="full-width"
-                        type="submit"
-                        disabled={isLoading}/>)
+    function footer(): ReactElement {
+        return (
+            <Button label={isLoading ? "Logging in..." : "Login"}
+                    icon={isLoading ? "pi pi-spin pi-spinner" : "pi pi-sign-in"}
+                    className="full-width"
+                    type="submit"
+                    disabled={isLoading}/>
+        )
     }
 
     return (
@@ -73,7 +75,7 @@ export default function LoginPage() {
                                        className="full-width"
                                        placeholder="Username"
                                        value={username}
-                                       onChange={(e) => setUsername(e.target.value)}/>
+                                       onChange={(e: ChangeEvent<HTMLInputElement>): void => setUsername(e.target.value)}/>
                             <label htmlFor="username">Username</label>
                         </FloatLabel>
 
@@ -83,7 +85,7 @@ export default function LoginPage() {
                                        type="password"
                                        placeholder="Password"
                                        value={password}
-                                       onChange={(e) => setPassword(e.target.value)}/>
+                                       onChange={(e: ChangeEvent<HTMLInputElement>): void => setPassword(e.target.value)}/>
                             <label htmlFor="password">Password</label>
                         </FloatLabel>
                     </div>

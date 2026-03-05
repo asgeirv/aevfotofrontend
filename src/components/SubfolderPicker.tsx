@@ -1,5 +1,6 @@
 import {FloatLabel} from "primereact/floatlabel";
-import {Dropdown} from "primereact/dropdown";
+import {Dropdown, type DropdownChangeEvent} from "primereact/dropdown";
+import type {ReactElement} from "react";
 
 interface SubfolderPickerProps {
     subfolders: string[] | undefined;
@@ -7,8 +8,12 @@ interface SubfolderPickerProps {
     setSelectedSubfolder: (subfolder: string | undefined) => void;
 }
 
-export function SubfolderPicker({subfolders, selectedSubfolder, setSelectedSubfolder}: SubfolderPickerProps) {
-    const disabled = !subfolders || subfolders.length == 0;
+export function SubfolderPicker({
+                                    subfolders,
+                                    selectedSubfolder,
+                                    setSelectedSubfolder
+                                }: SubfolderPickerProps): ReactElement {
+    const disabled: boolean = !subfolders || subfolders.length == 0;
 
     if (disabled) {
         setSelectedSubfolder(undefined);
@@ -24,7 +29,7 @@ export function SubfolderPicker({subfolders, selectedSubfolder, setSelectedSubfo
                 <Dropdown inputId="subfolder-picker"
                           variant="filled"
                           disabled={disabled}
-                          onChange={e => setSelectedSubfolder(e.target.value)}
+                          onChange={(e: DropdownChangeEvent): void => setSelectedSubfolder(e.target.value)}
                           value={selectedSubfolder}
                           options={subfolders}
                           optionLabel="name"

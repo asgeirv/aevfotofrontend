@@ -4,8 +4,9 @@ import {BrowserRouter, Routes, Route, Navigate} from 'react-router-dom';
 import LoginPage from "./LoginPage.tsx";
 import ProtectedRoute from "./components/ProtectedRoute.tsx";
 import AppPage from "./AppPage.tsx";
+import type {ReactElement} from "react";
 
-function App() {
+function App(): ReactElement {
 
     return (
         <div className="wrapper">

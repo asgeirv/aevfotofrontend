@@ -7,7 +7,7 @@ interface PhotoTableProps {
     emptyMessage: string;
 }
 
-export function PhotoTable({photos, emptyMessage}: PhotoTableProps) {
+export function PhotoTable({photos, emptyMessage}: PhotoTableProps): ReactElement {
     if (photos && photos.length > 0) {
         return (
             <>

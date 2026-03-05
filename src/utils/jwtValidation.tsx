@@ -10,7 +10,7 @@ export interface JwtPayload {
 const isTokenExpired: (token: string) => boolean = (token: string): boolean => {
     try {
         const currentTime: number = Date.now();
-        const expirationTime = getTokenExpirationTime(token);
+        const expirationTime: number | null = getTokenExpirationTime(token);
         if (!expirationTime) {
             return true;
         }

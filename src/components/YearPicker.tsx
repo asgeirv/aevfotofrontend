@@ -1,5 +1,6 @@
 import {FloatLabel} from "primereact/floatlabel";
-import {Dropdown} from "primereact/dropdown";
+import {Dropdown, type DropdownChangeEvent} from "primereact/dropdown";
+import type {ReactElement} from "react";
 
 interface YearPickerProps {
     years: number[];
@@ -7,13 +8,13 @@ interface YearPickerProps {
     setYear: (year: number) => void;
 }
 
-export function YearPicker({years, selectedYear, setYear}: YearPickerProps) {
+export function YearPicker({years, selectedYear, setYear}: YearPickerProps): ReactElement {
     return (
         <div className="datepicker-container">
             <FloatLabel>
                 <Dropdown inputId="year-picker"
                           variant="filled"
-                          onChange={e => setYear(e.target.value)}
+                          onChange={(e: DropdownChangeEvent): void => setYear(e.target.value)}
                           value={selectedYear}
                           options={years}
                           optionLabel="year"

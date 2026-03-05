@@ -46,17 +46,18 @@ export function DeletionView({photos, setPhotos}: DeletionViewProps): React.Reac
                     className="nav-button"
                     icon="pi pi-trash"
                     label="Wastebin"
-                    onClick={(e) => deleted.current?.toggle(e)}/>
+                    onClick={(e): void | undefined => deleted.current?.toggle(e)}/>
 
             <OverlayPanel ref={deleted}>
                 {authStuff.canWrite() && photos && photos.length > 0 ? (
                     <>
-                        <ConfirmDialog/><Button type="button"
-                                                icon="pi pi-trash"
-                                                severity="danger"
-                                                size="large"
-                                                onClick={confirmNuke}
-                                                style={{width: "100%", marginBottom: "1rem"}}/>
+                        <ConfirmDialog/>
+                        <Button type="button"
+                                icon="pi pi-trash"
+                                severity="danger"
+                                size="large"
+                                onClick={confirmNuke}
+                                style={{width: "100%", marginBottom: "1rem"}}/>
                     </>
                 ) : null}
 

@@ -40,7 +40,7 @@ export function PortfolioView(): React.ReactElement {
                     icon="pi pi-image"
                     label="Portfolio"
                     style={{marginBottom: "1rem"}}
-                    onClick={(e) => portfolio.current?.toggle(e)}
+                    onClick={(e): void | undefined => portfolio.current?.toggle(e)}
             />
             <OverlayPanel ref={portfolio}
                           style={{maxWidth: "70%"}}>
@@ -49,7 +49,7 @@ export function PortfolioView(): React.ReactElement {
                         Rating threshold:
                         <Dropdown value={ratingThreshold}
                                   style={{marginLeft: "0.5rem"}}
-                                  onChange={(e: DropdownChangeEvent) => {
+                                  onChange={(e: DropdownChangeEvent): void => {
                                       setRatingThreshold(e.target.value);
                                   }}
                                   options={availableRatings}/>

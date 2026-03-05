@@ -68,13 +68,6 @@ export default function AppPage(): ReactElement {
             .catch((err): void => console.log(err));
     }, [deletedPhotos]);
 
-
-    if (!authStuff.isAuthenticated) {
-        return (
-            <div className="app-container">Please do the login stuff</div>
-        )
-    }
-
     return (
         <div className="app-container">
             <div className="nav">
