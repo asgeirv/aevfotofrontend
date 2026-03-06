@@ -46,6 +46,7 @@ export function DeletionView({photos, setPhotos}: DeletionViewProps): React.Reac
                     className="nav-button"
                     icon="pi pi-trash"
                     label="Wastebin"
+                    badge={photos.length.toString()}
                     onClick={(e): void | undefined => deleted.current?.toggle(e)}/>
 
             <OverlayPanel ref={deleted}>
@@ -54,6 +55,8 @@ export function DeletionView({photos, setPhotos}: DeletionViewProps): React.Reac
                         <ConfirmDialog/>
                         <Button type="button"
                                 icon="pi pi-trash"
+                                tooltip="Permanently delete all photos marked for deletion"
+                                tooltipOptions={{position: "top"}}
                                 severity="danger"
                                 size="large"
                                 onClick={confirmNuke}
