@@ -1,26 +1,34 @@
 import {OverlayPanel} from "primereact/overlaypanel";
 import {Button} from "primereact/button";
 import * as React from "react";
-import {useEffect, useRef, useState} from "react";
+import {useContext, useEffect, useRef, useState} from "react";
 import type {Photo} from "../models/Photo.ts";
 import {Dropdown, type DropdownChangeEvent} from "primereact/dropdown";
 import {PhotoTable} from "./PhotoTable.tsx";
 import {apiClient} from "../utils/apiClient.tsx";
+import {ToastContext, type ToastSeverity} from "../ToastContext.tsx";
 
 export function PortfolioView(): React.ReactElement {
+    const showToast: ((severity: ToastSeverity, message: string) => void) | null = useContext(ToastContext);
     const portfolio: React.RefObject<OverlayPanel | null> = useRef<OverlayPanel>(null);
     const [photos, setPhotos] = useState<Photo[]>([]);
     const [ratingThreshold, setRatingThreshold] = useState<number>(5);
     const availableRatings: number[] = [5, 4, 3, 2, 1];
+    const [isPreparingDownload, setPreparingDownload] = useState<boolean>(false);
 
     useEffect((): void => {
         apiClient(`portfolio/${ratingThreshold}`)
             .then((res: Response): Promise<Photo[]> => res.json())
             .then((data: Photo[]): void => setPhotos(data))
-            .catch((err): void => console.log(err));
-    }, [ratingThreshold]);
+            .catch((err: Error): void => {
+                showToast?.("error", "Failed to fetch portfolio");
+                console.log(err);
+            });
+    }, [ratingThreshold, showToast]);
 
     function downloadPortfolio(): void {
+        setPreparingDownload(true);
+        showToast?.("info", "Downloading portfolio")
         apiClient(`portfolio/dl/${ratingThreshold}`)
             .then((res: Response): Promise<Blob> => res.blob())
             .then((blob: Blob): void => {
@@ -30,6 +38,12 @@ export function PortfolioView(): React.ReactElement {
                 link.download = "portfolio.zip";
                 link.click();
                 link.parentNode?.removeChild(link);
+                setPreparingDownload(false);
+            })
+            .catch((err: Error): void => {
+                showToast?.("error", "Failed to download portfolio");
+                console.log(err);
+                setPreparingDownload(false);
             })
     }
 
@@ -56,7 +70,8 @@ export function PortfolioView(): React.ReactElement {
                     </div>
 
                     <Button type="button"
-                            icon="pi pi-download"
+                            icon={isPreparingDownload ? "pi pi-spin pi-spinner" : "pi pi-download"}
+                            disabled={isPreparingDownload}
                             onClick={downloadPortfolio}
                             tooltip="Download"
                             tooltipOptions={{position: "top"}}/>

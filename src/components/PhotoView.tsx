@@ -1,5 +1,5 @@
 import * as React from "react";
-import {type ReactElement, useCallback, useEffect, useState} from "react";
+import {type ReactElement, useCallback, useContext, useEffect, useState} from "react";
 import {useGlobalKeydown} from "../KeyBoardEvents.tsx";
 import {Card} from "primereact/card";
 import {Image} from "primereact/image";
@@ -10,6 +10,7 @@ import type {Photo} from "../models/Photo.ts";
 import {apiClient, fetchPhotoData} from "../utils/apiClient.tsx";
 import type {PhotoData} from "../models/PhotoData.ts";
 import {type AuthStuff, useAuth} from "../hooks/useAuth.tsx";
+import {ToastContext, type ToastSeverity} from "../ToastContext.tsx";
 
 interface PhotoViewProps {
     photos: Photo[] | undefined;
@@ -18,6 +19,7 @@ interface PhotoViewProps {
 export function PhotoView({photos}: PhotoViewProps): ReactElement {
     photos?.sort((a: Photo, b: Photo) => (a.filename < b.filename) ? -1 : (a.filename > b.filename) ? 1 : 0);
     const authStuff: AuthStuff = useAuth();
+    const showToast: ((severity: ToastSeverity, message: string) => void) | null = useContext(ToastContext);
     const [currentId, setCurrentId] = useState<number>(0);
     const [count, setCount] = useState<number>(0);
     const [thumbImg, setThumbImg] = useState<string | undefined>();
@@ -57,6 +59,8 @@ export function PhotoView({photos}: PhotoViewProps): ReactElement {
 
     function updateRating(photo: Photo, rating: Nullable<number>): void {
         if (rating === undefined) {
+            showToast?.("error", "Undefined rating")
+
             console.error("Undefined rating!");
             return;
         } else if (rating === null) {
@@ -82,7 +86,10 @@ export function PhotoView({photos}: PhotoViewProps): ReactElement {
                     "Content-type": "application/json"
                 }
             })
-            .catch(err => console.log(err));
+            .catch(err => {
+                showToast?.("error", "Failed to update rating");
+                console.log(err);
+            });
 
         // force update
         setCount(count + 1);
@@ -91,12 +98,20 @@ export function PhotoView({photos}: PhotoViewProps): ReactElement {
     useEffect((): void => {
         if (photos && photos.length > 0) {
             fetchPhotoData(getCurrentPhoto().id, true)
-                .then((img: PhotoData): void => setThumbImg(img.data));
+                .then((img: PhotoData): void => setThumbImg(img.data))
+                .catch((err: Error): void => {
+                    showToast?.("error", "Failed to fetch photos");
+                    console.log(err);
+                });
 
             fetchPhotoData(getCurrentPhoto().id)
                 .then((img: PhotoData): void => setLargeImg(img.data))
+                .catch((err: Error): void => {
+                    showToast?.("error", "Failed to fetch photos");
+                    console.log(err);
+                });
         }
-    }, [photos, thumbImg, largeImg, getCurrentPhoto]);
+    }, [photos, thumbImg, largeImg, getCurrentPhoto, showToast]);
 
     function onKeyDown(e: React.KeyboardEvent): void {
         switch (e.key) {

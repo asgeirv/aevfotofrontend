@@ -5,14 +5,17 @@ import {YearPicker} from "./components/YearPicker.tsx";
 import {MonthPicker} from "./components/MonthPicker.tsx";
 import {SubfolderPicker} from "./components/SubfolderPicker.tsx";
 import {PhotoView} from "./components/PhotoView.tsx";
-import {type ReactElement, useEffect, useState} from "react";
+import {type ReactElement, type RefObject, useEffect, useRef, useState} from "react";
 import type {Photo} from "./models/Photo.ts";
 import {type AuthStuff, useAuth} from "./hooks/useAuth.tsx";
 import {Button} from "primereact/button";
 import {apiClient} from "./utils/apiClient.tsx";
+import {Toast} from "primereact/toast";
+import {ToastContext, type ToastSeverity} from "./ToastContext.tsx";
 
 export default function AppPage(): ReactElement {
     const authStuff: AuthStuff = useAuth();
+    const toast: RefObject<Toast | null> = useRef(null);
     const [selectedYear, setSelectedYear] = useState<number>();
     const [years, setYears] = useState<number[]>([]);
     const [selectedMonth, setSelectedMonth] = useState<number>();
@@ -22,11 +25,18 @@ export default function AppPage(): ReactElement {
     const [photos, setPhotos] = useState<Photo[]>([]);
     const [deletedPhotos, setDeletedPhotos] = useState<Photo[]>([]);
 
+    const showToast: (severity: ToastSeverity, message: string) => void = (severity: ToastSeverity, message: string): void => {
+        toast.current?.show({severity: severity, detail: message});
+    }
+
     useEffect((): void => {
         apiClient("years")
             .then((res: Response): Promise<number[]> => res.json())
             .then((data: number[]): void => setYears(data))
-            .catch(err => console.error(err));
+            .catch(err => {
+                showToast("error", "Error getting years");
+                console.error(err);
+            });
     }, []);
 
     useEffect((): void => {
@@ -34,7 +44,10 @@ export default function AppPage(): ReactElement {
             apiClient(`${selectedYear}`)
                 .then((res: Response): Promise<number[]> => res.json())
                 .then((data: number[]): void => setMonths(data))
-                .catch(err => console.error(err));
+                .catch(err => {
+                    showToast("error", `Error getting months for $${selectedYear}`);
+                    console.error(err);
+                });
         }
     }, [selectedYear]);
 
@@ -43,7 +56,10 @@ export default function AppPage(): ReactElement {
             apiClient(`${selectedYear}/${selectedMonth}/subfolders`)
                 .then((res: Response): Promise<string[]> => res.json())
                 .then((data: string[]): void => setSubfolders(data))
-                .catch(err => console.error(err));
+                .catch(err => {
+                    showToast("error", `Error getting subfolders for ${selectedYear}/${selectedMonth}`);
+                    console.error(err);
+                });
         }
     }, [selectedYear, selectedMonth]);
 
@@ -52,12 +68,18 @@ export default function AppPage(): ReactElement {
             apiClient(`photos/${selectedYear}/${selectedMonth}/${selectedSubfolder}`)
                 .then((res: Response): Promise<Photo[]> => res.json())
                 .then((data: Photo[]): void => setPhotos(data))
-                .catch(err => console.error(err));
+                .catch(err => {
+                    showToast("error", `Error getting photos for ${selectedYear}/${selectedMonth}/${selectedSubfolder}`);
+                    console.error(err);
+                });
         } else if (selectedYear && selectedMonth) {
             apiClient(`photos/${selectedYear}/${selectedMonth}`)
                 .then((res: Response): Promise<Photo[]> => res.json())
                 .then((data: Photo[]): void => setPhotos(data))
-                .catch(err => console.error(err));
+                .catch(err => {
+                    showToast("error", `Error getting photos for ${selectedYear}/${selectedMonth}`);
+                    console.error(err);
+                });
         }
     }, [selectedYear, selectedMonth, selectedSubfolder]);
 
@@ -65,47 +87,54 @@ export default function AppPage(): ReactElement {
         apiClient("photos/deleted")
             .then((res: Response): Promise<Photo[]> => res.json())
             .then((data: Photo[]): void => setDeletedPhotos(data))
-            .catch((err): void => console.log(err));
+            .catch((err): void => {
+                showToast("error", "Error getting photos flagged for deletion")
+                console.log(err);
+            });
     }, [deletedPhotos]);
 
     return (
-        <div className="app-container">
-            <div className="nav">
-                <Card id="buttons"
-                      className="photo-handling-card">
-                    <div className="photo-handling">
-                        <div className="nav-buttons">
-                            <PortfolioView/>
-                            <DeletionView photos={deletedPhotos}
-                                          setPhotos={setDeletedPhotos}/>
+        <ToastContext value={showToast}>
+            <div className="app-container">
+                <Toast ref={toast}/>
+
+                <div className="nav">
+                    <Card id="buttons"
+                          className="photo-handling-card">
+                        <div className="photo-handling">
+                            <div className="nav-buttons">
+                                <PortfolioView/>
+                                <DeletionView photos={deletedPhotos}
+                                              setPhotos={setDeletedPhotos}/>
+                            </div>
+
+                            <div className="logout-button">
+                                <Button icon="pi pi-sign-out"
+                                        onClick={(): void => authStuff.logout()}/>
+                            </div>
                         </div>
+                    </Card>
 
-                        <div className="logout-button">
-                            <Button icon="pi pi-sign-out"
-                                    onClick={(): void => authStuff.logout()}/>
+                    <Card id="dropdowns"
+                          className="photo-handling-card">
+                        <div className="date-nav">
+                            <YearPicker years={years}
+                                        selectedYear={selectedYear}
+                                        setYear={setSelectedYear}/>
+
+                            <MonthPicker months={months}
+                                         selectedMonth={selectedMonth}
+                                         setMonth={setSelectedMonth}/>
+
+                            <SubfolderPicker subfolders={subfolders}
+                                             selectedSubfolder={selectedSubfolder}
+                                             setSelectedSubfolder={setSelectedSubfolder}/>
                         </div>
-                    </div>
-                </Card>
+                    </Card>
+                </div>
 
-                <Card id="dropdowns"
-                      className="photo-handling-card">
-                    <div className="date-nav">
-                        <YearPicker years={years}
-                                    selectedYear={selectedYear}
-                                    setYear={setSelectedYear}/>
-
-                        <MonthPicker months={months}
-                                     selectedMonth={selectedMonth}
-                                     setMonth={setSelectedMonth}/>
-
-                        <SubfolderPicker subfolders={subfolders}
-                                         selectedSubfolder={selectedSubfolder}
-                                         setSelectedSubfolder={setSelectedSubfolder}/>
-                    </div>
-                </Card>
+                <PhotoView photos={photos}/>
             </div>
-
-            <PhotoView photos={photos}/>
-        </div>
+        </ToastContext>
     )
 }

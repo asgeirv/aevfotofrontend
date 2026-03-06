@@ -78,10 +78,6 @@ export const fetchPhotoData: (id: number, thumb?: boolean) => Promise<PhotoData>
             } else {
                 return {id: id, data: undefined};
             }
-        })
-        .catch((err: Error): PhotoData => {
-            console.log(err);
-            return {id: id, data: undefined};
         });
 }
 

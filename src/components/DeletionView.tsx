@@ -1,12 +1,13 @@
 import {Button} from "primereact/button";
 import * as React from "react";
-import {useRef} from "react";
+import {useContext, useRef} from "react";
 import {OverlayPanel} from "primereact/overlaypanel";
 import type {Photo} from "../models/Photo.ts";
 import {PhotoTable} from "./PhotoTable.tsx";
 import {confirmDialog, ConfirmDialog} from "primereact/confirmdialog";
 import {apiClient} from "../utils/apiClient.tsx";
 import {type AuthStuff, useAuth} from "../hooks/useAuth.tsx";
+import {ToastContext, type ToastSeverity} from "../ToastContext.tsx";
 
 interface DeletionViewProps {
     photos: Photo[];
@@ -15,6 +16,7 @@ interface DeletionViewProps {
 
 export function DeletionView({photos, setPhotos}: DeletionViewProps): React.ReactElement {
     const authStuff: AuthStuff = useAuth();
+    const showToast: ((severity: ToastSeverity, message: string) => void) | null = useContext(ToastContext);
     const deleted: React.RefObject<OverlayPanel | null> = useRef<OverlayPanel>(null);
 
     const accept: () => void = (): void => {
@@ -22,8 +24,14 @@ export function DeletionView({photos, setPhotos}: DeletionViewProps): React.Reac
             {
                 method: "DELETE"
             })
-            .then((): void => setPhotos([]))
-            .catch((err): void => console.log(err));
+            .then((): void => {
+                showToast?.("info", "Deleted all flagged photos");
+                setPhotos([]);
+            })
+            .catch((err): void => {
+                showToast?.("error", "Error deleting photos. Some may not have been deleted.");
+                console.log(err);
+            });
     };
 
     const reject: () => void = (): void => {
