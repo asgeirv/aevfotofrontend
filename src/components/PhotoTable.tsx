@@ -1,6 +1,6 @@
 import type {Photo} from "../models/Photo.ts";
 import type {ReactElement} from "react";
-import {PortfolioPhoto} from "./PortfolioPhoto.tsx";
+import {PhotoFrame} from "./PhotoFrame.tsx";
 
 interface PhotoTableProps {
     photos: Photo[] | undefined;
@@ -17,7 +17,8 @@ export function PhotoTable({photos, emptyMessage}: PhotoTableProps): ReactElemen
                             return (
                                 <div key={index}
                                      className="portfolio-thumb">
-                                    <PortfolioPhoto photo={photo}/>
+                                    <PhotoFrame photo={photo}
+                                                imageClassName="portfolio-thumb"/>
                                 </div>
                             )
                         })

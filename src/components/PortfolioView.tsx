@@ -6,15 +6,16 @@ import type {Photo} from "../models/Photo.ts";
 import {Dropdown, type DropdownChangeEvent} from "primereact/dropdown";
 import {PhotoTable} from "./PhotoTable.tsx";
 import {apiClient} from "../utils/apiClient.tsx";
-import {ToastContext, type ToastSeverity} from "../ToastContext.tsx";
+import {ToastContext, type ToastSeverity} from "../context/ToastContext.tsx";
+import {PortfolioDownload} from "./PortfolioDownload.tsx";
 
 export function PortfolioView(): React.ReactElement {
-    const showToast: ((severity: ToastSeverity, message: string) => void) | null = useContext(ToastContext);
+    const showToast: ((severity: ToastSeverity, message: string) => void) | undefined = useContext(ToastContext);
     const portfolio: React.RefObject<OverlayPanel | null> = useRef<OverlayPanel>(null);
+
     const [photos, setPhotos] = useState<Photo[]>([]);
     const [ratingThreshold, setRatingThreshold] = useState<number>(5);
     const availableRatings: number[] = [5, 4, 3, 2, 1];
-    const [isPreparingDownload, setPreparingDownload] = useState<boolean>(false);
 
     useEffect((): void => {
         apiClient(`portfolio/${ratingThreshold}`)
@@ -25,27 +26,6 @@ export function PortfolioView(): React.ReactElement {
                 console.log(err);
             });
     }, [ratingThreshold, showToast]);
-
-    function downloadPortfolio(): void {
-        setPreparingDownload(true);
-        showToast?.("info", "Downloading portfolio")
-        apiClient(`portfolio/dl/${ratingThreshold}`)
-            .then((res: Response): Promise<Blob> => res.blob())
-            .then((blob: Blob): void => {
-                const fileUrl: string = URL.createObjectURL(blob);
-                const link: HTMLAnchorElement = document.createElement("a");
-                link.href = fileUrl;
-                link.download = "portfolio.zip";
-                link.click();
-                link.parentNode?.removeChild(link);
-                setPreparingDownload(false);
-            })
-            .catch((err: Error): void => {
-                showToast?.("error", "Failed to download portfolio");
-                console.log(err);
-                setPreparingDownload(false);
-            })
-    }
 
     return (
         <div>
@@ -69,12 +49,7 @@ export function PortfolioView(): React.ReactElement {
                                   options={availableRatings}/>
                     </div>
 
-                    <Button type="button"
-                            icon={isPreparingDownload ? "pi pi-spin pi-spinner" : "pi pi-download"}
-                            disabled={isPreparingDownload}
-                            onClick={downloadPortfolio}
-                            tooltip="Download"
-                            tooltipOptions={{position: "top"}}/>
+                    <PortfolioDownload ratingThreshold={ratingThreshold}/>
                 </div>
 
                 <PhotoTable photos={photos}

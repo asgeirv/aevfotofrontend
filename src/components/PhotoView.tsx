@@ -1,8 +1,7 @@
 import * as React from "react";
-import {type ReactElement, useCallback, useContext, useEffect, useState} from "react";
+import {type ReactElement, useCallback, useEffect, useEffectEvent, useState} from "react";
 import {useGlobalKeydown} from "../KeyBoardEvents.tsx";
 import {Card} from "primereact/card";
-import {Image} from "primereact/image";
 import {Button} from "primereact/button";
 import {Rating, type RatingChangeEvent} from "primereact/rating";
 import type {Nullable} from "primereact/ts-helpers";
@@ -10,20 +9,46 @@ import type {Photo} from "../models/Photo.ts";
 import {apiClient, fetchPhotoData} from "../utils/apiClient.tsx";
 import type {PhotoData} from "../models/PhotoData.ts";
 import {type AuthStuff, useAuth} from "../hooks/useAuth.tsx";
-import {ToastContext, type ToastSeverity} from "../ToastContext.tsx";
+import {type ToastSeverity, useToast} from "../context/ToastContext.tsx";
+import {type NavData, useNavContext} from "../context/NavContext.tsx";
+import {PhotoFrame} from "./PhotoFrame.tsx";
 
-interface PhotoViewProps {
-    photos: Photo[] | undefined;
-}
-
-export function PhotoView({photos}: PhotoViewProps): ReactElement {
-    photos?.sort((a: Photo, b: Photo) => (a.filename < b.filename) ? -1 : (a.filename > b.filename) ? 1 : 0);
+export function PhotoView(): ReactElement {
     const authStuff: AuthStuff = useAuth();
-    const showToast: ((severity: ToastSeverity, message: string) => void) | null = useContext(ToastContext);
+    const showToast: ((severity: ToastSeverity, message: string) => void) | undefined = useToast();
+    const navData: NavData = useNavContext();
+
+    const [photos, setPhotos] = useState<Photo[]>([]);
     const [currentId, setCurrentId] = useState<number>(0);
     const [count, setCount] = useState<number>(0);
     const [thumbImg, setThumbImg] = useState<string | undefined>();
     const [largeImg, setLargeImg] = useState<string | undefined>();
+
+    const onError: () => void = useEffectEvent((): void => {
+        showToast("error", `Error getting photos for ${navData.year}/${navData.month}/${navData.subfolder}`);
+    });
+
+    useEffect((): void => {
+        if (navData.year && navData.month && navData.subfolder) {
+            apiClient(`photos/${navData.year}/${navData.month}/${navData.subfolder}`)
+                .then((res: Response): Promise<Photo[]> => res.json())
+                .then((data: Photo[]): void => setPhotos(data))
+                .catch(err => {
+                    onError();
+                    console.error(err);
+                });
+        } else if (navData.year && navData.month) {
+            apiClient(`photos/${navData.year}/${navData.month}`)
+                .then((res: Response): Promise<Photo[]> => res.json())
+                .then((data: Photo[]): void => setPhotos(data))
+                .catch(err => {
+                    onError();
+                    console.error(err);
+                });
+        }
+    }, [navData.year, navData.month, navData.subfolder]);
+
+    photos?.sort((a: Photo, b: Photo) => (a.filename < b.filename) ? -1 : (a.filename > b.filename) ? 1 : 0);
 
     if (photos && currentId > photos.length) {
         setCurrentId(0);
@@ -179,13 +204,8 @@ export function PhotoView({photos}: PhotoViewProps): ReactElement {
                 {photos && photos.length > 0 ? (
                     <>
                         <div className="photo-container">
-                            <div className="photo">
-                                <Image src={thumbImg}
-                                       preview
-                                       zoomSrc={largeImg}
-                                       indicatorIcon="pi pi-search"
-                                       className="photo"/>
-                            </div>
+                            <PhotoFrame photo={getCurrentPhoto()}
+                                        imageClassName="photo"/>
                         </div>
 
                         <div id="photo-nav-container">

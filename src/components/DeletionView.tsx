@@ -1,23 +1,29 @@
 import {Button} from "primereact/button";
 import * as React from "react";
-import {useContext, useRef} from "react";
+import {useContext, useEffect, useRef, useState} from "react";
 import {OverlayPanel} from "primereact/overlaypanel";
 import type {Photo} from "../models/Photo.ts";
 import {PhotoTable} from "./PhotoTable.tsx";
 import {confirmDialog, ConfirmDialog} from "primereact/confirmdialog";
 import {apiClient} from "../utils/apiClient.tsx";
 import {type AuthStuff, useAuth} from "../hooks/useAuth.tsx";
-import {ToastContext, type ToastSeverity} from "../ToastContext.tsx";
+import {ToastContext, type ToastContextType} from "../context/ToastContext.tsx";
 
-interface DeletionViewProps {
-    photos: Photo[];
-    setPhotos: (photos: Photo[]) => void;
-}
-
-export function DeletionView({photos, setPhotos}: DeletionViewProps): React.ReactElement {
+export function DeletionView(): React.ReactElement {
     const authStuff: AuthStuff = useAuth();
-    const showToast: ((severity: ToastSeverity, message: string) => void) | null = useContext(ToastContext);
-    const deleted: React.RefObject<OverlayPanel | null> = useRef<OverlayPanel>(null);
+    const showToast: ToastContextType | undefined = useContext(ToastContext);
+    const deletedPanel: React.RefObject<OverlayPanel | null> = useRef<OverlayPanel>(null);
+    const [deletedPhotos, setDeletedPhotos] = useState<Photo[]>([]);
+
+    useEffect((): void => {
+        apiClient("photos/deleted")
+            .then((res: Response): Promise<Photo[]> => res.json())
+            .then((data: Photo[]): void => setDeletedPhotos(data))
+            .catch((err: Error): void => {
+                showToast?.("error", "Error getting photos flagged for deletion")
+                console.log(err);
+            });
+    }, [showToast]);
 
     const accept: () => void = (): void => {
         apiClient("photos/deleted/nuke",
@@ -26,9 +32,9 @@ export function DeletionView({photos, setPhotos}: DeletionViewProps): React.Reac
             })
             .then((): void => {
                 showToast?.("info", "Deleted all flagged photos");
-                setPhotos([]);
+                setDeletedPhotos([]);
             })
-            .catch((err): void => {
+            .catch((err: Error): void => {
                 showToast?.("error", "Error deleting photos. Some may not have been deleted.");
                 console.log(err);
             });
@@ -54,11 +60,11 @@ export function DeletionView({photos, setPhotos}: DeletionViewProps): React.Reac
                     className="nav-button"
                     icon="pi pi-trash"
                     label="Wastebin"
-                    badge={photos.length.toString()}
-                    onClick={(e): void | undefined => deleted.current?.toggle(e)}/>
+                    badge={deletedPhotos.length.toString()}
+                    onClick={(e): void | undefined => deletedPanel.current?.toggle(e)}/>
 
-            <OverlayPanel ref={deleted}>
-                {authStuff.canWrite() && photos && photos.length > 0 ? (
+            <OverlayPanel ref={deletedPanel}>
+                {authStuff.canWrite() && deletedPhotos && deletedPhotos.length > 0 ? (
                     <>
                         <ConfirmDialog/>
                         <Button type="button"
@@ -72,7 +78,7 @@ export function DeletionView({photos, setPhotos}: DeletionViewProps): React.Reac
                     </>
                 ) : null}
 
-                <PhotoTable photos={photos}
+                <PhotoTable photos={deletedPhotos}
                             emptyMessage={"No photos flagged for deletion."}/>
             </OverlayPanel>
         </div>

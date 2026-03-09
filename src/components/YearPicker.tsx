@@ -1,21 +1,37 @@
 import {FloatLabel} from "primereact/floatlabel";
 import {Dropdown, type DropdownChangeEvent} from "primereact/dropdown";
-import type {ReactElement} from "react";
+import {type ReactElement, useEffect, useEffectEvent, useState} from "react";
+import {apiClient} from "../utils/apiClient.tsx";
+import {type ToastSeverity, useToast} from "../context/ToastContext.tsx";
+import {type NavData, useNavContext} from "../context/NavContext.tsx";
 
-interface YearPickerProps {
-    years: number[];
-    selectedYear: number | undefined;
-    setYear: (year: number) => void;
-}
+export function YearPicker(): ReactElement {
+    const [years, setYears] = useState<number[]>([]);
 
-export function YearPicker({years, selectedYear, setYear}: YearPickerProps): ReactElement {
+    const navData: NavData = useNavContext();
+    const showToast: (severity: ToastSeverity, message: string) => void = useToast();
+
+    const onError: () => void = useEffectEvent((): void => {
+        showToast("error", "Error getting years");
+    });
+
+    useEffect((): void => {
+        apiClient("years")
+            .then((res: Response): Promise<number[]> => res.json())
+            .then((data: number[]): void => setYears(data))
+            .catch((err: Error): void => {
+                onError();
+                console.error(err);
+            });
+    }, []);
+
     return (
         <div className="datepicker-container">
             <FloatLabel>
                 <Dropdown inputId="year-picker"
                           variant="filled"
-                          onChange={(e: DropdownChangeEvent): void => setYear(e.target.value)}
-                          value={selectedYear}
+                          onChange={(e: DropdownChangeEvent): void => navData.setYear(e.target.value)}
+                          value={navData.year}
                           options={years}
                           optionLabel="year"
                           placeholder="Select year"/>

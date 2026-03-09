@@ -1,6 +1,3 @@
-// utils/auth.ts
-// Helper functions for authentication
-
 export const setAuthToken: (token: string) => void = (token: string): void => {
     localStorage.setItem('token', token);
 };

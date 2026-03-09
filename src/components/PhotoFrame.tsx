@@ -1,4 +1,4 @@
-import {type ReactElement, useEffect, useState} from "react";
+import {type ReactElement, useEffect, useEffectEvent, useState} from "react";
 import {fetchPhotoData} from "../utils/apiClient.tsx";
 import type {Photo} from "../models/Photo.ts";
 import type {PhotoData} from "../models/PhotoData.ts";
@@ -7,17 +7,23 @@ import {Spinner} from "./Spinner.tsx";
 
 interface PhotoProps {
     photo: Photo;
+    imageClassName: string;
 }
 
-export function PortfolioPhoto({photo}: PhotoProps): ReactElement {
+export function PhotoFrame({photo, imageClassName}: PhotoProps): ReactElement {
+    console.log(`Rendering photo frame for photo: ${photo.id}!`)
     const [thumbData, setThumbData] = useState<string>();
     const [isLoading, setIsLoading] = useState<boolean>(true);
 
-    useEffect((): void => {
+    const fetchPhoto: (photo: Photo) => void = useEffectEvent((photo: Photo): void => {
         fetchPhotoData(photo.id, true)
             .then((data: PhotoData): void => setThumbData(data.data))
             .then((): void => setIsLoading(false))
-    }, [setThumbData, isLoading, photo.id]);
+    })
+
+    useEffect((): void => {
+        fetchPhoto(photo);
+    }, [photo]);
 
     return (
         (
@@ -28,7 +34,7 @@ export function PortfolioPhoto({photo}: PhotoProps): ReactElement {
                            src={thumbData}
                            preview
                            indicatorIcon="pi pi-search"
-                           imageClassName="portfolio-thumb"/>
+                           imageClassName={imageClassName}/>
                 </>
         )
     );
