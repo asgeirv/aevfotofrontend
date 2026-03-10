@@ -189,7 +189,7 @@
     justify-content: space-between;
 }
 
-#photo-nav-container {
+.photo-nav-container {
     margin-top: 1rem;
     display: flex;
     flex-direction: row;

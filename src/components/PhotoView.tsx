@@ -1,17 +1,17 @@
 import * as React from "react";
-import {type ReactElement, useCallback, useEffect, useEffectEvent, useState} from "react";
+import {type ReactElement, useEffect, useEffectEvent, useState} from "react";
 import {useGlobalKeydown} from "../KeyBoardEvents.tsx";
 import {Card} from "primereact/card";
 import {Button} from "primereact/button";
-import {Rating, type RatingChangeEvent} from "primereact/rating";
-import type {Nullable} from "primereact/ts-helpers";
-import type {Photo, PhotoRating} from "../models/Photo.ts";
+import type {Photo} from "../models/Photo.ts";
 import {apiClient} from "../utils/apiClient.tsx";
 import {type AuthStuff, useAuth} from "../hooks/useAuth.tsx";
 import {useToast} from "../context/ToastContext.tsx";
 import {type NavData, useNavContext} from "../context/NavContext.tsx";
 import {PhotoFrame} from "./PhotoFrame.tsx";
 import {MessageSeverity} from "primereact/api";
+import {PhotoRater} from "./PhotoRater.tsx";
+import {NextUnratedButton} from "./NextUnratedButton.tsx";
 
 export function PhotoView(): ReactElement {
     const authStuff: AuthStuff = useAuth();
@@ -72,34 +72,6 @@ export function PhotoView(): ReactElement {
         }
     }
 
-    const getCurrentPhoto: () => Photo = useCallback((): Photo => {
-        if (photos && photos.length > 0) {
-            return photos[currentId]
-        } else {
-            throw new Error("No photos found!");
-        }
-    }, [currentId, photos]);
-
-    function updateRating(photo: Photo, rating: Nullable<number>): void {
-        if (rating === undefined) {
-            showToast(MessageSeverity.ERROR, "Undefined rating")
-
-            console.error("Undefined rating!");
-            return;
-        } else if (rating === null) {
-            photo.rating = 0;
-        } else if (rating < 0 || rating > 5) {
-            showToast(MessageSeverity.ERROR, "Invalid rating")
-
-            console.error("Invalid rating!");
-            return;
-        } else {
-            photo.rating = rating as PhotoRating;
-        }
-
-        updatePhoto(photo);
-    }
-
     function toggleDeletion(photo: Photo): void {
         photo.flaggedForDeletion = !photo.flaggedForDeletion;
         updatePhoto(photo);
@@ -133,37 +105,7 @@ export function PhotoView(): ReactElement {
                 break;
             case "Delete":
                 if (photos && photos.length > 0) {
-                    toggleDeletion(getCurrentPhoto());
-                }
-                break;
-            case "0":
-                if (photos && photos.length > 0) {
-                    updateRating(getCurrentPhoto(), 0);
-                }
-                break;
-            case "1":
-                if (photos && photos.length > 0) {
-                    updateRating(getCurrentPhoto(), 1);
-                }
-                break;
-            case "2":
-                if (photos && photos.length > 0) {
-                    updateRating(getCurrentPhoto(), 2);
-                }
-                break;
-            case "3":
-                if (photos && photos.length > 0) {
-                    updateRating(getCurrentPhoto(), 3);
-                }
-                break;
-            case "4":
-                if (photos && photos.length > 0) {
-                    updateRating(getCurrentPhoto(), 4);
-                }
-                break;
-            case "5":
-                if (photos && photos.length > 0) {
-                    updateRating(getCurrentPhoto(), 5);
+                    toggleDeletion(photos[currentId]);
                 }
                 break;
         }
@@ -189,24 +131,31 @@ export function PhotoView(): ReactElement {
                 {photos && photos.length > 0 ? (
                     <>
                         <div className="photo-container">
-                            <PhotoFrame photoId={getCurrentPhoto().id}
+                            <PhotoFrame photoId={photos[currentId].id}
                                         imageClassName="photo"/>
                         </div>
 
-                        <div id="photo-nav-container">
+                        <div className="photo-nav-container">
                             <Button icon="pi pi-arrow-left"
                                     onClick={previousPhoto}
                                     tooltip="Previous photo (Arrow Key Left)"
                                     tooltipOptions={{position: "right"}}/>
 
-                            <Rating value={photos[currentId].rating}
-                                    onChange={(e: RatingChangeEvent): void => updateRating(getCurrentPhoto(), e.value)}
-                                    readOnly={!authStuff.canWrite()}/>
+                            <PhotoRater photo={photos[currentId]}
+                                        updatePhoto={updatePhoto}
+                                        readOnly={!authStuff.canWrite()}/>
 
-                            <Button icon="pi pi-arrow-right"
-                                    onClick={nextPhoto}
-                                    tooltip="Next photo (Arrow Key Right)"
-                                    tooltipOptions={{position: "left"}}/>
+                            <div>
+                                <NextUnratedButton photos={photos}
+                                                   currentId={currentId}
+                                                   setCurrentId={setCurrentId}/>
+
+                                <Button icon="pi pi-arrow-right"
+                                        onClick={nextPhoto}
+                                        tooltip="Next photo (Arrow Key Right)"
+                                        tooltipOptions={{position: "bottom"}}
+                                style={{marginLeft: "0.5rem"}}/>
+                            </div>
                         </div>
 
                         {authStuff.canWrite() ? (
@@ -214,7 +163,7 @@ export function PhotoView(): ReactElement {
                                 <Button
                                     icon={photos[currentId].flaggedForDeletion ? "pi pi-undo" : "pi pi-trash"}
                                     severity="danger"
-                                    onClick={(): void => toggleDeletion(getCurrentPhoto())}
+                                    onClick={(): void => toggleDeletion(photos[currentId])}
                                     tooltip="Mark for deletion (Del)"
                                     tooltipOptions={{position: "bottom"}}/>
                             </div>

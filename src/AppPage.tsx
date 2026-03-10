@@ -14,7 +14,6 @@ import type {Month} from "./models/Photo.ts";
 import type {MessageSeverity} from "primereact/api";
 
 export default function AppPage(): ReactElement {
-    console.log("Rendering App Page");
     const authStuff: AuthStuff = useAuth();
     const toast: RefObject<Toast | null> = useRef(null);
 
@@ -60,7 +59,6 @@ const CreateNavContext: () => NavData = (): NavData => {
     const [year, setYear] = useState<number | undefined>(undefined);
     const [month, setMonth] = useState<Month | undefined>(undefined);
     const [subfolder, setSubfolder] = useState<string | undefined>(undefined);
-    console.log("Creating nav context!")
 
     return {
         year,
