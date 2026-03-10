@@ -1,31 +1,36 @@
 import {OverlayPanel} from "primereact/overlaypanel";
 import {Button} from "primereact/button";
 import * as React from "react";
-import {useContext, useEffect, useRef, useState} from "react";
-import type {Photo} from "../models/Photo.ts";
+import {useEffect, useEffectEvent, useRef, useState} from "react";
+import type {Photo, PhotoRating} from "../models/Photo.ts";
 import {Dropdown, type DropdownChangeEvent} from "primereact/dropdown";
 import {PhotoTable} from "./PhotoTable.tsx";
 import {apiClient} from "../utils/apiClient.tsx";
-import {ToastContext, type ToastSeverity} from "../context/ToastContext.tsx";
+import {type ToastData, useToast} from "../context/ToastContext.tsx";
 import {PortfolioDownload} from "./PortfolioDownload.tsx";
+import {MessageSeverity} from "primereact/api";
 
 export function PortfolioView(): React.ReactElement {
-    const showToast: ((severity: ToastSeverity, message: string) => void) | undefined = useContext(ToastContext);
+    const showToast: ToastData = useToast();
     const portfolio: React.RefObject<OverlayPanel | null> = useRef<OverlayPanel>(null);
 
     const [photos, setPhotos] = useState<Photo[]>([]);
-    const [ratingThreshold, setRatingThreshold] = useState<number>(5);
-    const availableRatings: number[] = [5, 4, 3, 2, 1];
+    const [ratingThreshold, setRatingThreshold] = useState<PhotoRating>(5);
+    const availableRatings: number[] = [0, 1, 2, 3, 4, 5];
+
+    const onError: (message: string) => void = useEffectEvent((message: string): void => {
+        showToast(MessageSeverity.ERROR, message);
+    });
 
     useEffect((): void => {
         apiClient(`portfolio/${ratingThreshold}`)
             .then((res: Response): Promise<Photo[]> => res.json())
             .then((data: Photo[]): void => setPhotos(data))
             .catch((err: Error): void => {
-                showToast?.("error", "Failed to fetch portfolio");
+                onError("Failed to fetch portfolio");
                 console.log(err);
             });
-    }, [ratingThreshold, showToast]);
+    }, [ratingThreshold]);
 
     return (
         <div>

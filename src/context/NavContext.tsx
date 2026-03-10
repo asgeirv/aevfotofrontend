@@ -1,6 +1,5 @@
 import {type Context, createContext, useContext} from "react";
-
-export type Month = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
+import type {Month} from "../models/Photo.ts";
 
 export type NavData = {
     year: number | undefined;

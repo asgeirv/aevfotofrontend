@@ -17,7 +17,7 @@ export function PhotoTable({photos, emptyMessage}: PhotoTableProps): ReactElemen
                             return (
                                 <div key={index}
                                      className="portfolio-thumb">
-                                    <PhotoFrame photo={photo}
+                                    <PhotoFrame photoId={photo.id}
                                                 imageClassName="portfolio-thumb"/>
                                 </div>
                             )

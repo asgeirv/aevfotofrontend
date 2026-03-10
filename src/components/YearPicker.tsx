@@ -2,17 +2,18 @@ import {FloatLabel} from "primereact/floatlabel";
 import {Dropdown, type DropdownChangeEvent} from "primereact/dropdown";
 import {type ReactElement, useEffect, useEffectEvent, useState} from "react";
 import {apiClient} from "../utils/apiClient.tsx";
-import {type ToastSeverity, useToast} from "../context/ToastContext.tsx";
+import {type ToastStuff, useToast} from "../context/ToastContext.tsx";
 import {type NavData, useNavContext} from "../context/NavContext.tsx";
+import {MessageSeverity} from "primereact/api";
 
 export function YearPicker(): ReactElement {
     const [years, setYears] = useState<number[]>([]);
 
     const navData: NavData = useNavContext();
-    const showToast: (severity: ToastSeverity, message: string) => void = useToast();
+    const showToast: ToastStuff = useToast();
 
     const onError: () => void = useEffectEvent((): void => {
-        showToast("error", "Error getting years");
+        showToast(MessageSeverity.ERROR, "Error getting years");
     });
 
     useEffect((): void => {

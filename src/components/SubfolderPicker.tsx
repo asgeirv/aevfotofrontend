@@ -1,15 +1,20 @@
 import {FloatLabel} from "primereact/floatlabel";
 import {Dropdown, type DropdownChangeEvent} from "primereact/dropdown";
-import {type ReactElement, useContext, useEffect, useState} from "react";
+import {type ReactElement, useEffect, useEffectEvent, useState} from "react";
 import {type NavData, useNavContext} from "../context/NavContext.tsx";
 import {apiClient} from "../utils/apiClient.tsx";
-import {ToastContext, type ToastContextType} from "../context/ToastContext.tsx";
+import {type ToastData, useToast} from "../context/ToastContext.tsx";
+import {MessageSeverity} from "primereact/api";
 
 export function SubfolderPicker(): ReactElement {
     const [subfolders, setSubfolders] = useState<string[]>([]);
 
     const navData: NavData = useNavContext();
-    const showToast: ToastContextType | undefined = useContext(ToastContext);
+    const showToast: ToastData = useToast();
+
+    const onError: (message: string) => void = useEffectEvent((message: string): void => {
+        showToast(MessageSeverity.ERROR, message);
+    });
 
     useEffect((): void => {
         if (navData.year && navData.month) {
@@ -17,11 +22,11 @@ export function SubfolderPicker(): ReactElement {
                 .then((res: Response): Promise<string[]> => res.json())
                 .then((data: string[]): void => setSubfolders(data))
                 .catch((err: Error): void => {
-                    showToast?.("error", `Error getting subfolders for ${navData.year}/${navData.month}`);
+                    onError(`Error getting subfolders for ${navData.year}/${navData.month}`);
                     console.error(err);
                 });
         }
-    }, [navData.year, navData.month, showToast]);
+    }, [navData.year, navData.month]);
 
     const disabled: boolean = !subfolders || subfolders.length == 0;
 

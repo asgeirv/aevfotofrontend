@@ -1,29 +1,34 @@
 import {Button} from "primereact/button";
 import * as React from "react";
-import {useContext, useEffect, useRef, useState} from "react";
+import {useEffect, useEffectEvent, useRef, useState} from "react";
 import {OverlayPanel} from "primereact/overlaypanel";
 import type {Photo} from "../models/Photo.ts";
 import {PhotoTable} from "./PhotoTable.tsx";
 import {confirmDialog, ConfirmDialog} from "primereact/confirmdialog";
 import {apiClient} from "../utils/apiClient.tsx";
 import {type AuthStuff, useAuth} from "../hooks/useAuth.tsx";
-import {ToastContext, type ToastContextType} from "../context/ToastContext.tsx";
+import {type ToastStuff, useToast} from "../context/ToastContext.tsx";
+import {MessageSeverity} from "primereact/api";
 
 export function DeletionView(): React.ReactElement {
     const authStuff: AuthStuff = useAuth();
-    const showToast: ToastContextType | undefined = useContext(ToastContext);
+    const showToast: ToastStuff = useToast();
     const deletedPanel: React.RefObject<OverlayPanel | null> = useRef<OverlayPanel>(null);
     const [deletedPhotos, setDeletedPhotos] = useState<Photo[]>([]);
+
+    const onError: (message: string) => void = useEffectEvent((message: string): void => {
+        showToast(MessageSeverity.ERROR, message);
+    });
 
     useEffect((): void => {
         apiClient("photos/deleted")
             .then((res: Response): Promise<Photo[]> => res.json())
             .then((data: Photo[]): void => setDeletedPhotos(data))
             .catch((err: Error): void => {
-                showToast?.("error", "Error getting photos flagged for deletion")
+                onError("Error getting photos flagged for deletion");
                 console.log(err);
             });
-    }, [showToast]);
+    }, []);
 
     const accept: () => void = (): void => {
         apiClient("photos/deleted/nuke",
@@ -31,11 +36,11 @@ export function DeletionView(): React.ReactElement {
                 method: "DELETE"
             })
             .then((): void => {
-                showToast?.("info", "Deleted all flagged photos");
+                showToast(MessageSeverity.INFO, "Deleted all flagged photos");
                 setDeletedPhotos([]);
             })
             .catch((err: Error): void => {
-                showToast?.("error", "Error deleting photos. Some may not have been deleted.");
+                showToast(MessageSeverity.ERROR, "Error deleting photos. Some may not have been deleted.");
                 console.log(err);
             });
     };

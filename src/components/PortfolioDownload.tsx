@@ -1,7 +1,8 @@
-import {type ReactElement, useContext, useState} from "react";
+import {type ReactElement, useState} from "react";
 import {apiClient} from "../utils/apiClient.tsx";
-import {ToastContext, type ToastContextType} from "../context/ToastContext.tsx";
+import {type ToastData, useToast} from "../context/ToastContext.tsx";
 import {Button} from "primereact/button";
+import {MessageSeverity} from "primereact/api";
 
 interface PortfolioDownloadProps {
     ratingThreshold: number
@@ -10,11 +11,11 @@ interface PortfolioDownloadProps {
 export function PortfolioDownload({ratingThreshold}: PortfolioDownloadProps): ReactElement {
     const [isPreparingDownload, setPreparingDownload] = useState<boolean>(false);
 
-    const showToast: ToastContextType | undefined = useContext(ToastContext);
+    const showToast: ToastData = useToast();
 
     function downloadPortfolio(): void {
         setPreparingDownload(true);
-        showToast?.("info", "Downloading portfolio")
+        showToast(MessageSeverity.INFO, "Downloading portfolio")
         apiClient(`portfolio/dl/${ratingThreshold}`)
             .then((res: Response): Promise<Blob> => res.blob())
             .then((blob: Blob): void => {
@@ -27,7 +28,7 @@ export function PortfolioDownload({ratingThreshold}: PortfolioDownloadProps): Re
                 setPreparingDownload(false);
             })
             .catch((err: Error): void => {
-                showToast?.("error", "Failed to download portfolio");
+                showToast(MessageSeverity.ERROR, "Failed to download portfolio");
                 console.log(err);
                 setPreparingDownload(false);
             })

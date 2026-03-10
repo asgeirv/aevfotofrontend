@@ -6,16 +6,19 @@ import {type ReactElement, type RefObject, useRef, useState} from "react";
 import {type AuthStuff, useAuth} from "./hooks/useAuth.tsx";
 import {Button} from "primereact/button";
 import {Toast} from "primereact/toast";
-import {ToastContext, type ToastSeverity} from "./context/ToastContext.tsx";
+import {ToastContext} from "./context/ToastContext.tsx";
 import {PhotoNav} from "./components/PhotoNav.tsx";
-import {type Month, NavContext, type NavData} from "./context/NavContext.tsx";
+import {NavContext, type NavData} from "./context/NavContext.tsx";
 import 'primeicons/primeicons.css';
+import type {Month} from "./models/Photo.ts";
+import type {MessageSeverity} from "primereact/api";
 
 export default function AppPage(): ReactElement {
+    console.log("Rendering App Page");
     const authStuff: AuthStuff = useAuth();
     const toast: RefObject<Toast | null> = useRef(null);
 
-    const showToast: (severity: ToastSeverity, message: string) => void = (severity: ToastSeverity, message: string): void => {
+    const showToast: (severity: MessageSeverity, message: string) => void = (severity: MessageSeverity, message: string): void => {
         toast.current?.show({severity: severity, detail: message});
     }
     return (

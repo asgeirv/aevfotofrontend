@@ -5,27 +5,25 @@ import {Card} from "primereact/card";
 import {Button} from "primereact/button";
 import {Rating, type RatingChangeEvent} from "primereact/rating";
 import type {Nullable} from "primereact/ts-helpers";
-import type {Photo} from "../models/Photo.ts";
-import {apiClient, fetchPhotoData} from "../utils/apiClient.tsx";
-import type {PhotoData} from "../models/PhotoData.ts";
+import type {Photo, PhotoRating} from "../models/Photo.ts";
+import {apiClient} from "../utils/apiClient.tsx";
 import {type AuthStuff, useAuth} from "../hooks/useAuth.tsx";
-import {type ToastSeverity, useToast} from "../context/ToastContext.tsx";
+import {useToast} from "../context/ToastContext.tsx";
 import {type NavData, useNavContext} from "../context/NavContext.tsx";
 import {PhotoFrame} from "./PhotoFrame.tsx";
+import {MessageSeverity} from "primereact/api";
 
 export function PhotoView(): ReactElement {
     const authStuff: AuthStuff = useAuth();
-    const showToast: ((severity: ToastSeverity, message: string) => void) | undefined = useToast();
+    const showToast: ((severity: MessageSeverity, message: string) => void) = useToast();
     const navData: NavData = useNavContext();
 
     const [photos, setPhotos] = useState<Photo[]>([]);
     const [currentId, setCurrentId] = useState<number>(0);
     const [count, setCount] = useState<number>(0);
-    const [thumbImg, setThumbImg] = useState<string | undefined>();
-    const [largeImg, setLargeImg] = useState<string | undefined>();
 
-    const onError: () => void = useEffectEvent((): void => {
-        showToast("error", `Error getting photos for ${navData.year}/${navData.month}/${navData.subfolder}`);
+    const onError: (message: string) => void = useEffectEvent((message: string): void => {
+        showToast(MessageSeverity.ERROR, message);
     });
 
     useEffect((): void => {
@@ -34,7 +32,7 @@ export function PhotoView(): ReactElement {
                 .then((res: Response): Promise<Photo[]> => res.json())
                 .then((data: Photo[]): void => setPhotos(data))
                 .catch(err => {
-                    onError();
+                    onError(`Error getting photos for ${navData.year}/${navData.month}/${navData.subfolder}`);
                     console.error(err);
                 });
         } else if (navData.year && navData.month) {
@@ -42,7 +40,7 @@ export function PhotoView(): ReactElement {
                 .then((res: Response): Promise<Photo[]> => res.json())
                 .then((data: Photo[]): void => setPhotos(data))
                 .catch(err => {
-                    onError();
+                    onError(`Error getting photos for ${navData.year}/${navData.month}`);
                     console.error(err);
                 });
         }
@@ -84,14 +82,19 @@ export function PhotoView(): ReactElement {
 
     function updateRating(photo: Photo, rating: Nullable<number>): void {
         if (rating === undefined) {
-            showToast?.("error", "Undefined rating")
+            showToast(MessageSeverity.ERROR, "Undefined rating")
 
             console.error("Undefined rating!");
             return;
         } else if (rating === null) {
             photo.rating = 0;
+        } else if (rating < 0 || rating > 5) {
+            showToast(MessageSeverity.ERROR, "Invalid rating")
+
+            console.error("Invalid rating!");
+            return;
         } else {
-            photo.rating = rating;
+            photo.rating = rating as PhotoRating;
         }
 
         updatePhoto(photo);
@@ -112,31 +115,13 @@ export function PhotoView(): ReactElement {
                 }
             })
             .catch(err => {
-                showToast?.("error", "Failed to update rating");
+                showToast(MessageSeverity.ERROR, "Failed to update rating");
                 console.log(err);
             });
 
         // force update
         setCount(count + 1);
     }
-
-    useEffect((): void => {
-        if (photos && photos.length > 0) {
-            fetchPhotoData(getCurrentPhoto().id, true)
-                .then((img: PhotoData): void => setThumbImg(img.data))
-                .catch((err: Error): void => {
-                    showToast?.("error", "Failed to fetch photos");
-                    console.log(err);
-                });
-
-            fetchPhotoData(getCurrentPhoto().id)
-                .then((img: PhotoData): void => setLargeImg(img.data))
-                .catch((err: Error): void => {
-                    showToast?.("error", "Failed to fetch photos");
-                    console.log(err);
-                });
-        }
-    }, [photos, thumbImg, largeImg, getCurrentPhoto, showToast]);
 
     function onKeyDown(e: React.KeyboardEvent): void {
         switch (e.key) {
@@ -204,7 +189,7 @@ export function PhotoView(): ReactElement {
                 {photos && photos.length > 0 ? (
                     <>
                         <div className="photo-container">
-                            <PhotoFrame photo={getCurrentPhoto()}
+                            <PhotoFrame photoId={getCurrentPhoto().id}
                                         imageClassName="photo"/>
                         </div>
 
@@ -236,7 +221,7 @@ export function PhotoView(): ReactElement {
                         ) : null}
                     </>
                 ) : (
-                    <p>No photos found!</p>
+                    <p className="photo-container">No photos found!</p>
                 )}
             </Card>
         </div>
