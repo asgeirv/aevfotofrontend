@@ -196,6 +196,13 @@
     justify-content: space-between;
 }
 
+.photo-rating-container {
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+    gap: 0.25rem;
+}
+
 #photo-del-container {
     padding-top: 2rem;
     display: flex;

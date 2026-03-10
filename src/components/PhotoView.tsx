@@ -11,7 +11,6 @@ import {type NavData, useNavContext} from "../context/NavContext.tsx";
 import {PhotoFrame} from "./PhotoFrame.tsx";
 import {MessageSeverity} from "primereact/api";
 import {PhotoRater} from "./PhotoRater.tsx";
-import {NextUnratedButton} from "./NextUnratedButton.tsx";
 
 export function PhotoView(): ReactElement {
     const authStuff: AuthStuff = useAuth();
@@ -139,23 +138,19 @@ export function PhotoView(): ReactElement {
                             <Button icon="pi pi-arrow-left"
                                     onClick={previousPhoto}
                                     tooltip="Previous photo (Arrow Key Left)"
-                                    tooltipOptions={{position: "right"}}/>
+                                    tooltipOptions={{position: "bottom"}}/>
 
-                            <PhotoRater photo={photos[currentId]}
+                            <PhotoRater photos={photos}
+                                        currentId={currentId}
+                                        setCurrentId={setCurrentId}
                                         updatePhoto={updatePhoto}
                                         readOnly={!authStuff.canWrite()}/>
 
-                            <div>
-                                <NextUnratedButton photos={photos}
-                                                   currentId={currentId}
-                                                   setCurrentId={setCurrentId}/>
 
-                                <Button icon="pi pi-arrow-right"
-                                        onClick={nextPhoto}
-                                        tooltip="Next photo (Arrow Key Right)"
-                                        tooltipOptions={{position: "bottom"}}
-                                style={{marginLeft: "0.5rem"}}/>
-                            </div>
+                            <Button icon="pi pi-arrow-right"
+                                    onClick={nextPhoto}
+                                    tooltip="Next photo (Arrow Key Right)"
+                                    tooltipOptions={{position: "bottom"}}/>
                         </div>
 
                         {authStuff.canWrite() ? (
