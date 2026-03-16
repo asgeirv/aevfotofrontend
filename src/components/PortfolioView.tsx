@@ -6,12 +6,12 @@ import type {Photo, PhotoRating} from "../models/Photo.ts";
 import {Dropdown, type DropdownChangeEvent} from "primereact/dropdown";
 import {PhotoTable} from "./PhotoTable.tsx";
 import {apiClient} from "../utils/apiClient.tsx";
-import {type ToastData, useToast} from "../context/ToastContext.tsx";
+import {type ToastStuff, useToast} from "../context/ToastContext.tsx";
 import {PortfolioDownload} from "./PortfolioDownload.tsx";
 import {MessageSeverity} from "primereact/api";
 
 export function PortfolioView(): React.ReactElement {
-    const showToast: ToastData = useToast();
+    const showToast: ToastStuff = useToast();
     const portfolio: React.RefObject<OverlayPanel | null> = useRef<OverlayPanel>(null);
 
     const [photos, setPhotos] = useState<Photo[]>([]);

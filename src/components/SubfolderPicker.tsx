@@ -3,14 +3,14 @@ import {Dropdown, type DropdownChangeEvent} from "primereact/dropdown";
 import {type ReactElement, useEffect, useEffectEvent, useState} from "react";
 import {type NavData, useNavContext} from "../context/NavContext.tsx";
 import {apiClient} from "../utils/apiClient.tsx";
-import {type ToastData, useToast} from "../context/ToastContext.tsx";
+import {type ToastStuff, useToast} from "../context/ToastContext.tsx";
 import {MessageSeverity} from "primereact/api";
 
 export function SubfolderPicker(): ReactElement {
     const [subfolders, setSubfolders] = useState<string[]>([]);
 
     const navData: NavData = useNavContext();
-    const showToast: ToastData = useToast();
+    const showToast: ToastStuff = useToast();
 
     const onError: (message: string) => void = useEffectEvent((message: string): void => {
         showToast(MessageSeverity.ERROR, message);

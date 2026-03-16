@@ -1,6 +1,6 @@
 import {type ReactElement, useState} from "react";
 import {apiClient} from "../utils/apiClient.tsx";
-import {type ToastData, useToast} from "../context/ToastContext.tsx";
+import {type ToastStuff, useToast} from "../context/ToastContext.tsx";
 import {Button} from "primereact/button";
 import {MessageSeverity} from "primereact/api";
 
@@ -11,7 +11,7 @@ interface PortfolioDownloadProps {
 export function PortfolioDownload({ratingThreshold}: PortfolioDownloadProps): ReactElement {
     const [isPreparingDownload, setPreparingDownload] = useState<boolean>(false);
 
-    const showToast: ToastData = useToast();
+    const showToast: ToastStuff = useToast();
 
     function downloadPortfolio(): void {
         setPreparingDownload(true);
