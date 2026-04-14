@@ -43,6 +43,7 @@ export default function AppPage(): ReactElement {
                         </Card>
 
                         <p>dis is sooper test</p>
+                        <p>another sooper test</p>
 
                         <Card id="dropdowns"
                               className="photo-handling-card">
