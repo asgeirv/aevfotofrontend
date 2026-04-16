@@ -29,6 +29,7 @@ export default function AppPage(): ReactElement {
                     <Card id="header"
                           style={{marginBottom: "0.3rem"}}>
                         <h2>Hello OpenAI!</h2>
+                        <p>This is an app for reviewing photos</p>
                     </Card>
 
                     <div id="content">
