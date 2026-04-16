@@ -27,9 +27,8 @@ export default function AppPage(): ReactElement {
                     <Toast ref={toast}/>
 
                     <Card id="header"
-                          header="Hello OpenAI"
-                    style={{marginBottom: "0.3rem"}}>
-
+                          style={{marginBottom: "0.3rem"}}>
+                        <h2>Hello OpenAI!</h2>
                     </Card>
 
                     <div id="content">
