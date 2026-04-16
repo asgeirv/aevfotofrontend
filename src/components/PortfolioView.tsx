@@ -39,6 +39,7 @@ export function PortfolioView(): React.ReactElement {
                     icon="pi pi-image"
                     label="Portfolio"
                     style={{marginBottom: "1rem"}}
+                    badge={photos.length > 99 ? "99+" : photos.length.toString()}
                     onClick={(e): void | undefined => portfolio.current?.toggle(e)}
             />
             <OverlayPanel ref={portfolio}
