@@ -26,6 +26,11 @@ export default function AppPage(): ReactElement {
                 <div className="app-container">
                     <Toast ref={toast}/>
 
+                    <Card id="header"
+                          header="Hello OpenAI">
+
+                    </Card>
+
                     <div className="nav">
                         <Card id="buttons"
                               className="photo-handling-card">
