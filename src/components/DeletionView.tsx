@@ -65,7 +65,7 @@ export function DeletionView(): React.ReactElement {
                     className="nav-button"
                     icon="pi pi-trash"
                     label="Wastebin"
-                    badge={deletedPhotos.length.toString()}
+                    badge={deletedPhotos.length > 99 ? "99+" : deletedPhotos.length.toString()}
                     onClick={(e): void | undefined => deletedPanel.current?.toggle(e)}/>
 
             <OverlayPanel ref={deletedPanel}>

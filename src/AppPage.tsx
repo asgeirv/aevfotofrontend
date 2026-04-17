@@ -27,33 +27,36 @@ export default function AppPage(): ReactElement {
                     <Toast ref={toast}/>
 
                     <Card id="header"
-                          header="Hello OpenAI">
-
+                          style={{marginBottom: "0.3rem"}}>
+                        <h2>Hello OpenAI!</h2>
+                        <p>This is an app for reviewing photos</p>
                     </Card>
 
-                    <div className="nav">
-                        <Card id="buttons"
-                              className="photo-handling-card">
-                            <div className="photo-handling">
-                                <div className="nav-buttons">
-                                    <PortfolioView/>
-                                    <DeletionView/>
-                                </div>
+                    <div id="content">
+                        <div className="nav">
+                            <Card id="buttons"
+                                  className="photo-handling-card">
+                                <div className="photo-handling">
+                                    <div className="nav-buttons">
+                                        <PortfolioView/>
+                                        <DeletionView/>
+                                    </div>
 
-                                <div className="logout-button">
-                                    <Button icon="pi pi-sign-out"
-                                            onClick={(): void => authStuff.logout()}/>
+                                    <div className="logout-button">
+                                        <Button icon="pi pi-sign-out"
+                                                onClick={(): void => authStuff.logout()}/>
+                                    </div>
                                 </div>
-                            </div>
-                        </Card>
+                            </Card>
 
-                        <Card id="dropdowns"
-                              className="photo-handling-card">
-                            <PhotoNav/>
-                        </Card>
+                            <Card id="dropdowns"
+                                  className="photo-handling-card">
+                                <PhotoNav/>
+                            </Card>
+                        </div>
+
+                        <PhotoView/>
                     </div>
-
-                    <PhotoView/>
                 </div>
             </NavContext>
         </ToastContext>
