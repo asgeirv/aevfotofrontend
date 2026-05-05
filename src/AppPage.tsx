@@ -37,6 +37,7 @@ export default function AppPage(): ReactElement {
                                            className="full-width"
                                            placeholder="Comment"
                                            value={comment}
+
                                            onChange={(e: ChangeEvent<HTMLInputElement>): void => setComment(e.target.value)}/>
                                 <label htmlFor="username">Username</label>
                             </FloatLabel>
