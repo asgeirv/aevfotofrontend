@@ -2,7 +2,7 @@ import {Card} from "primereact/card";
 import {PortfolioView} from "./components/PortfolioView.tsx";
 import {DeletionView} from "./components/DeletionView.tsx";
 import {PhotoView} from "./components/PhotoView.tsx";
-import {type ReactElement, type RefObject, useRef, useState} from "react";
+import {type ChangeEvent, type ReactElement, type RefObject, useRef, useState} from "react";
 import {type AuthStuff, useAuth} from "./hooks/useAuth.tsx";
 import {Button} from "primereact/button";
 import {Toast} from "primereact/toast";
@@ -12,10 +12,13 @@ import {NavContext, type NavData} from "./context/NavContext.tsx";
 import 'primeicons/primeicons.css';
 import type {Month} from "./models/Photo.ts";
 import type {MessageSeverity} from "primereact/api";
+import {InputText} from "primereact/inputtext";
+import {FloatLabel} from "primereact/floatlabel";
 
 export default function AppPage(): ReactElement {
     const authStuff: AuthStuff = useAuth();
     const toast: RefObject<Toast | null> = useRef(null);
+    const [comment, setComment] = useState("");
 
     const showToast: (severity: MessageSeverity, message: string) => void = (severity: MessageSeverity, message: string): void => {
         toast.current?.show({severity: severity, detail: message});
@@ -29,8 +32,14 @@ export default function AppPage(): ReactElement {
                     <Card id="header"
                           style={{marginBottom: "0.3rem"}}>
                         <div className="header-container">
-                            <h2 className="header-item">Hello OpenAI!</h2>
-                            <p className="header-item">This is an app for reviewing photos</p>
+                            <FloatLabel>
+                                <InputText id="comment"
+                                           className="full-width"
+                                           placeholder="Comment"
+                                           value={comment}
+                                           onChange={(e: ChangeEvent<HTMLInputElement>): void => setComment(e.target.value)}/>
+                                <label htmlFor="username">Username</label>
+                            </FloatLabel>
                         </div>
                     </Card>
 
